@@ -29,7 +29,29 @@ class _TableCalendarSampleState extends State<TableCalendarSample> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('カレンダー')),
+      appBar: AppBar(
+        title: const Text('カレンダー'),
+        actions: [
+          IconButton(
+            icon: Container(
+              margin: const EdgeInsets.only(right: 10),
+              padding: const EdgeInsets.all(6),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.grey.shade200,
+              ),
+              child: const Icon(
+                Icons.person,
+                size: 26,
+                color: Colors.black,
+              ),
+            ),
+            onPressed: () {
+              // TODO: Add action
+            },
+          ),
+        ],
+      ),
       body: TableCalendar(
         firstDay: DateTime.utc(2010, 1, 1),
         lastDay: DateTime.utc(2030, 1, 1),
