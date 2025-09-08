@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "847080639296",
+    "project_id": "ishibashi-syoutengai-calendar",
+    "storage_bucket": "ishibashi-syoutengai-calendar.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:847080639296:android:3905d2b75a7bd2a91f88a5",
+        "android_client_info": {
+          "package_name": "com.example.hackathon"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB3Z3IcYYLt93LjkF4DYNoT85Oi2eQd9Q0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
