@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+// Riverpodをインポート
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 void main() {
-  runApp(const MyApp());
+  // runAppの引数にProviderScopeを配置
+  runApp(ProviderScope(child: const MyApp()));
 }
 
 class MyApp extends StatelessWidget {
