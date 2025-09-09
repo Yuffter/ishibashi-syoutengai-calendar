@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import '../widget/store_image_form_modal.dart';
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -46,8 +47,23 @@ class _TableCalendarSampleState extends State<TableCalendarSample> {
                 color: Colors.black,
               ),
             ),
+            // onPressed: () {
+            //   // TODO: Add action
+            //   showStoreImageFormModal(context);
+            // },
             onPressed: () {
-              // TODO: Add action
+              showStoreImageFormModal(context);
+              // showModalBottomSheet(
+              //   context: context,
+              //   isScrollControlled: true,
+              //   builder: (_) => Container(
+              //     height: 300,
+              //     color: Colors.white,
+              //     child: const Center(
+              //       child: Text('テスト用のモーダル'),
+              //     ),
+              //   ),
+              // );
             },
           ),
         ],
