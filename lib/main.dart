@@ -7,7 +7,6 @@ import 'view/login_page.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:hackathon/widget/store_image_form_modal.dart';
-import 'firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -66,7 +65,12 @@ class _MyHomePageState extends State<MyHomePage> {
         title: Text(widget.title),
         centerTitle: true,
       ),
-      body: null
+      body: ElevatedButton(
+        onPressed: () {
+          showStoreImageFormModal(context);
+        },
+        child: const Text('画像をアップロード'),
+      ),
     );
   }
 }
