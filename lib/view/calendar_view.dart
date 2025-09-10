@@ -33,6 +33,16 @@ class _TableCalendarSampleState extends ConsumerState<TableCalendarSample> {
 
   @override
   Widget build(BuildContext context) {
+    final images = ref.watch(storeImageViewModelProvider).images;
+
+// イベントがある日を時刻なしDateでまとめる
+    final eventDates = images
+        .map((image) => DateTime(
+      image.eventDate.year,
+      image.eventDate.month,
+      image.eventDate.day,
+    ))
+        .toSet();
     final user_status_notifier = ref.watch(userStatusViewModelProvider.notifier);
     final isLoggedIn = ref.watch(userStatusViewModelProvider).isLoggedIn;
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -58,48 +68,12 @@ class _TableCalendarSampleState extends ConsumerState<TableCalendarSample> {
                 color: Colors.black,
               ),
             ),
-            // onPressed: () {
-            //   // TODO: Add action
-            //   showStoreImageFormModal(context);
-            // },
             onPressed: () {
               Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (context) => const LoginPage(),
                   ),
-              // showStoreImageFormModal(context);
-              // showDialog(
-              //   context: context,
-              //   builder: (context) {
-              //     return AlertDialog(
-              //       title: Text("タイトル"),
-              //       content: Text('ログイン状態: ${user_status.isLoggedIn}'),
-              //       actions: [
-              //         TextButton(
-              //           child: Text("Cancel"),
-              //           onPressed: () => Navigator.pop(context),
-              //         ),
-              //         TextButton(
-              //           child: Text("OK"),
-              //           onPressed: () => Navigator.pop(context),
-              //         ),
-              //       ],
-              //     );
-              //   },
-              // );
-              // LoginPage();
-              // showStoreImageFormModal(context);
-              // showModalBottomSheet(
-              //   context: context,
-              //   isScrollControlled: true,
-              //   builder: (_) => Container(
-              //     height: 300,
-              //     color: Colors.white,
-              //     child: const Center(
-              //       child: Text('テスト用のモーダル'),
-              //     ),
-              //   ),
               );
             },
           ),
@@ -119,6 +93,26 @@ class _TableCalendarSampleState extends ConsumerState<TableCalendarSample> {
                 _focusedDay = focusedDay;
               });
             },
+            calendarBuilders: CalendarBuilders(
+              markerBuilder: (context, date, events) {
+                final normalizedDate = DateTime(date.year, date.month, date.day);
+                final hasEvent = eventDates.contains(normalizedDate);
+
+                if (!hasEvent) return const SizedBox.shrink();
+
+                return Positioned(
+                  bottom: -4,
+                  child: Container(
+                    width: 7,
+                    height: 7,
+                    decoration: const BoxDecoration(
+                      color: Colors.grey, // ドットの色
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                );
+              },
+            ),
           ),
           const SizedBox(height: 8),
           Expanded(
