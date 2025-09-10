@@ -25,7 +25,8 @@ class TableCalendarSample extends ConsumerStatefulWidget {
   const TableCalendarSample({super.key});
 
   @override
-  ConsumerState<TableCalendarSample> createState() => _TableCalendarSampleState();
+  ConsumerState<TableCalendarSample> createState() =>
+      _TableCalendarSampleState();
 }
 
 class _TableCalendarSampleState extends ConsumerState<TableCalendarSample> {
@@ -36,13 +37,15 @@ class _TableCalendarSampleState extends ConsumerState<TableCalendarSample> {
   Widget build(BuildContext context) {
     final images = ref.watch(storeImageViewModelProvider).images;
 
-// イベントがある日を時刻なしDateでまとめる
+    // イベントがある日を時刻なしDateでまとめる
     final eventDates = images
-        .map((image) => DateTime(
-      image.eventDate.year,
-      image.eventDate.month,
-      image.eventDate.day,
-    ))
+        .map(
+          (image) => DateTime(
+            image.eventDate.year,
+            image.eventDate.month,
+            image.eventDate.day,
+          ),
+        )
         .toSet();
     final user_status = ref.watch(userStatusViewModelProvider.notifier);
     final isLoggedIn = ref.watch(userStatusViewModelProvider).isLoggedIn;
@@ -63,11 +66,7 @@ class _TableCalendarSampleState extends ConsumerState<TableCalendarSample> {
                 shape: BoxShape.circle,
                 color: Colors.grey.shade200,
               ),
-              child: const Icon(
-                Icons.person,
-                size: 26,
-                color: Colors.black,
-              ),
+              child: const Icon(Icons.person, size: 26, color: Colors.black),
             ),
             onPressed: () {
               if (user_status.isLoggedIn == true) {
@@ -88,13 +87,10 @@ class _TableCalendarSampleState extends ConsumerState<TableCalendarSample> {
                     );
                   },
                 );
-              }
-              else {
+              } else {
                 Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const LoginPage(),
-                    ),
+                  context,
+                  MaterialPageRoute(builder: (context) => const LoginPage()),
                 );
               }
             },
@@ -109,6 +105,7 @@ class _TableCalendarSampleState extends ConsumerState<TableCalendarSample> {
             focusedDay: _focusedDay,
             locale: 'ja_JP',
             selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
+            availableCalendarFormats: const {CalendarFormat.month: 'Month'},
             onDaySelected: (selectedDay, focusedDay) {
               setState(() {
                 _selectedDay = selectedDay;
@@ -117,7 +114,11 @@ class _TableCalendarSampleState extends ConsumerState<TableCalendarSample> {
             },
             calendarBuilders: CalendarBuilders(
               markerBuilder: (context, date, events) {
-                final normalizedDate = DateTime(date.year, date.month, date.day);
+                final normalizedDate = DateTime(
+                  date.year,
+                  date.month,
+                  date.day,
+                );
                 final hasEvent = eventDates.contains(normalizedDate);
 
                 if (!hasEvent) return const SizedBox.shrink();
@@ -141,9 +142,9 @@ class _TableCalendarSampleState extends ConsumerState<TableCalendarSample> {
             child: Consumer(
               builder: (context, ref, _) {
                 final images = ref.watch(storeImageViewModelProvider);
-                final filtered = images.images.where(
-                      (img) => isSameDay(img.eventDate, _selectedDay),
-                ).toList();
+                final filtered = images.images
+                    .where((img) => isSameDay(img.eventDate, _selectedDay))
+                    .toList();
 
                 if (filtered.isEmpty) {
                   return const Center(child: Text('この日のイベントはありません'));
@@ -220,10 +221,7 @@ class _TableCalendarSampleState extends ConsumerState<TableCalendarSample> {
                     showStoreImageFormModal(context);
                   },
                   backgroundColor: Colors.white,
-                  child: const Icon(
-                    Icons.add,
-                    size: 36,
-                  ),
+                  child: const Icon(Icons.add, size: 36),
                 ),
               ),
             )
