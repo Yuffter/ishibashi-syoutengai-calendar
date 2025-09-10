@@ -11,6 +11,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 // パスワードの表示・非表示を管理する
 final passwordVisibilityProvider = StateProvider<bool>((ref) => false);
 
+// エラーメッセージを管理するためのProvider
+final loginErrorProvider = StateProvider<String?>((ref) => null);
+
 // UI（画面）の作成
 class LoginPage extends ConsumerWidget {
   const LoginPage({super.key});
@@ -20,46 +23,86 @@ class LoginPage extends ConsumerWidget {
     final userStatus = ref.watch(userStatusViewModelProvider.notifier);
     final userLoginInput = ref.watch(userLoginInputViewModelProvider.notifier);
     final isPasswordVisible = ref.watch(passwordVisibilityProvider);
+    final loginError = ref.watch(loginErrorProvider);
 
     // ViewModelの状態を監視
     ref.listen<AsyncValue<User?>>(loginViewModelProvider, (previous, current) {
-      // ローディング中は何もしない
-      if (current.isLoading) return;
+      final errorNotifier = ref.read(loginErrorProvider.notifier);
 
-      // エラー時の処理
-      if (current.hasError) {
-        final error = current.error;
-        String errorMessage = 'エラーが発生しました';
-        if (error is FirebaseAuthException) {
-          // Firebaseの認証エラーコードに応じてメッセージを分岐 [2, 9]
-          switch (error.code) {
-            case 'user-not-found':
-              errorMessage = '指定されたメールアドレスのユーザーは見つかりません。';
-              break;
-            case 'wrong-password':
-              errorMessage = 'パスワードが間違っています。';
-              break;
-            case 'invalid-email':
-              errorMessage = 'メールアドレスの形式が正しくありません。';
-              break;
-            default:
-              errorMessage = 'ログインに失敗しました。';
-          }
-        }
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(errorMessage)));
+      // ローディング中はエラーをクリア
+      if (current.isLoading) {
+        errorNotifier.state = null;
         return;
       }
 
-      // 成功時の処理（previousがnullでcurrentがUserオブジェクトの場合）
-      if (current.hasValue &&
-          current.value != null &&
-          (previous == null || previous.value == null)) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text('ログインに成功しました')));
-        userStatus.updateLoginStatus(true);
+      // エラー時の処理
+      if (current.hasError && !current.isLoading) {
+        final error = current.error;
+        String errorMessage = 'ログインに失敗しました。もう一度お試しください。';
+        if (error is FirebaseAuthException) {
+          if (['user-not-found', 'wrong-password', 'invalid-credential']
+              .contains(error.code)) {
+            errorMessage = 'メールアドレスまたはパスワードが正しくありません。';
+          } else if (error.code == 'invalid-email') {
+            errorMessage = 'メールアドレスの形式が正しくありません。';
+          }
+        }
+        errorNotifier.state = errorMessage;
+        return;
+      }
+
+      // 成功時の処理
+      if (current.hasValue && current.value != null) {
+        final user = current.value!;
+        errorNotifier.state = null;
+
+        if (previous?.value == null) { // 以前はログインしていなかった、という条件に修正
+          // ログイン状態を更新
+          userStatus.updateLoginStatus(true);
+          ScaffoldMessenger.of(context)
+              .showSnackBar(const SnackBar(content: Text('ログインに成功しました')));
+
+          // 初回ログインかどうかを判定
+          final metadata = user.metadata;
+          final isInitialLogin = metadata.creationTime != null &&
+              metadata.lastSignInTime != null &&
+              metadata.lastSignInTime!.difference(metadata.creationTime!).inSeconds < 5;
+
+          if (isInitialLogin) {
+            // buildContextが非同期ギャップを越えて使われるため、`context.mounted`でチェック
+            Future.microtask(() {
+              if (context.mounted) {
+                showDialog(
+                  context: context,
+                  barrierDismissible: false, // ダイアログの外側をタップしても閉じない
+                  builder: (BuildContext dialogContext) {
+                    return AlertDialog(
+                      title: const Text('ようこそ'),
+                      content: const Text(
+                          'これは初回ログインです。セキュリティ向上のため、メールアドレスとパスワードの変更をおすすめします。'),
+                      actions: <Widget>[
+                        TextButton(
+                          child: const Text('後で'),
+                          onPressed: () {
+                            Navigator.of(dialogContext).pop();
+                          },
+                        ),
+                        TextButton(
+                          child: const Text('変更する'),
+                          onPressed: () {
+                            Navigator.of(dialogContext).pop();
+                            // TODO: メールアドレスとパスワードの変更フローを開始する
+                            print("パスワード変更フローを開始します");
+                          },
+                        ),
+                      ],
+                    );
+                  },
+                );
+              }
+            });
+          }
+        }
       }
     });
 
@@ -102,7 +145,9 @@ class LoginPage extends ConsumerWidget {
                     keyboardType: TextInputType.emailAddress,
                     onChanged: (value) {
                       // 入力値をProviderに保存
-                      ref.read(userLoginInputViewModelProvider.notifier).updateMail(value);
+                      ref
+                          .read(userLoginInputViewModelProvider.notifier)
+                          .updateMail(value);
                     },
                   ),
                   const SizedBox(height: 16),
@@ -129,19 +174,37 @@ class LoginPage extends ConsumerWidget {
                     ),
                     onChanged: (value) {
                       // 入力値をProviderに保存
-                      ref.read(userLoginInputViewModelProvider.notifier).updatePassword(value);
+                      ref
+                          .read(userLoginInputViewModelProvider.notifier)
+                          .updatePassword(value);
                     },
                   ),
-                  const SizedBox(height: 24),
+
+                  // エラーメッセージ表示
+                  if (loginError != null)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 16.0, bottom: 8.0),
+                      child: Text(
+                        loginError,
+                        textAlign: TextAlign.center,
+                        style:
+                            const TextStyle(color: Colors.red, fontSize: 14.0),
+                      ),
+                    )
+                  else
+                    const SizedBox(height: 24.0),
+
                   // ログインボタン
                   SizedBox(
                     height: 48,
                     child: ElevatedButton(
                       onPressed: () {
                         // ログイン処理
-                        print('ログイン試行 Email: ${userLoginInput.mailAddress}, Password: ${userLoginInput.password}');
-                        ref.read(loginViewModelProvider.notifier)
-                          .login(userLoginInput.mailAddress, userLoginInput.password);
+                        print(
+                            'ログイン試行 Email: ${userLoginInput.mailAddress}, Password: ${userLoginInput.password}');
+                        ref.read(loginViewModelProvider.notifier).login(
+                            userLoginInput.mailAddress,
+                            userLoginInput.password);
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.black,
@@ -171,7 +234,8 @@ class LoginPage extends ConsumerWidget {
                               // 利用規約ページに遷移
                               Navigator.of(context).push(
                                 MaterialPageRoute(
-                                  builder: (context) => const TermsOfServicePage(),
+                                  builder: (context) =>
+                                      const TermsOfServicePage(),
                                 ),
                               );
                             },
@@ -188,7 +252,8 @@ class LoginPage extends ConsumerWidget {
                               // プライバシーポリシーページに遷移
                               Navigator.of(context).push(
                                 MaterialPageRoute(
-                                  builder: (context) => const PrivacyPolicyPage(),
+                                  builder: (context) =>
+                                      const PrivacyPolicyPage(),
                                 ),
                               );
                             },
