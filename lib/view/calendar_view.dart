@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import '../widget/store_image_form_modal.dart';
+import 'package:hackathon/model/store_image.dart';
+import 'package:hackathon/view_model/store_image_view_model.dart';
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});

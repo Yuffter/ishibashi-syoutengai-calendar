@@ -199,7 +199,7 @@ class _StoreImageFormModalState extends ConsumerState<StoreImageFormModal> {
 
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text('保存に失敗しました: $e')));
+        ).showSnackBar(SnackBar(content: Text('保存に失敗しました: ${e.toString()}')));
       }
     }
   }
