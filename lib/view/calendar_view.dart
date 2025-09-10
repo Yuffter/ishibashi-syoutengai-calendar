@@ -43,7 +43,7 @@ class _TableCalendarSampleState extends ConsumerState<TableCalendarSample> {
       image.eventDate.day,
     ))
         .toSet();
-    final user_status_notifier = ref.watch(userStatusViewModelProvider.notifier);
+    final user_status = ref.watch(userStatusViewModelProvider.notifier);
     final isLoggedIn = ref.watch(userStatusViewModelProvider).isLoggedIn;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (isLoggedIn == true && Navigator.canPop(context)) {
@@ -69,12 +69,33 @@ class _TableCalendarSampleState extends ConsumerState<TableCalendarSample> {
               ),
             ),
             onPressed: () {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const LoginPage(),
-                  ),
-              );
+              if (user_status.isLoggedIn == true) {
+                showDialog(
+                  context: context,
+                  builder: (context) {
+                    return AlertDialog(
+                      title: const Text('ログイン中'),
+                      content: const Text('すでにログインしています'),
+                      actions: [
+                        TextButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                          child: const Text('閉じる'),
+                        ),
+                      ],
+                    );
+                  },
+                );
+              }
+              else {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const LoginPage(),
+                    ),
+                );
+              }
             },
           ),
         ],
