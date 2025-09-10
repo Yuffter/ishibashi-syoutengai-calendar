@@ -70,18 +70,71 @@ class _TableCalendarSampleState extends State<TableCalendarSample> {
           ),
         ],
       ),
-      body: TableCalendar(
-        firstDay: DateTime.utc(2010, 1, 1),
-        lastDay: DateTime.utc(2030, 1, 1),
-        focusedDay: _focusedDay,
-        locale: 'ja_JP',
-        selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
-        onDaySelected: (selectedDay, focusedDay) {
-          setState(() {
-            _selectedDay = selectedDay;
-            _focusedDay = focusedDay;
-          });
-        },
+      body: Column(
+        children: [
+          TableCalendar(
+            firstDay: DateTime.utc(2010, 1, 1),
+            lastDay: DateTime.utc(2030, 1, 1),
+            focusedDay: _focusedDay,
+            locale: 'ja_JP',
+            selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
+            onDaySelected: (selectedDay, focusedDay) {
+              setState(() {
+                _selectedDay = selectedDay;
+                _focusedDay = focusedDay;
+              });
+            },
+          ),
+          const SizedBox(height: 8),
+          Expanded(
+            child: Consumer(
+              builder: (context, ref, _) {
+                final images = ref.watch(storeImageViewModelProvider);
+                final filtered = images.images.where(
+                      (img) => isSameDay(img.eventDate, _selectedDay),
+                ).toList();
+
+                if (filtered.isEmpty) {
+                  return const Center(child: Text('この日のイベントはありません'));
+                }
+
+                return ListView.builder(
+                  itemCount: filtered.length,
+                  itemBuilder: (context, index) {
+                    final item = filtered[index];
+                    return Card(
+                      margin: const EdgeInsets.all(12),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Image.network(
+                            item.imageUrl,
+                            height: 180,
+                            width: double.infinity,
+                            fit: BoxFit.cover,
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(item.title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                                const SizedBox(height: 4),
+                                Text(item.description),
+                                const SizedBox(height: 4),
+                                Text('店舗名: ${item.storeName}'),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                );
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
