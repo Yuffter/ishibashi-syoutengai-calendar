@@ -1,4 +1,4 @@
-import 'package:intl/date_symbol_data_local.dart';import 'firebase_options.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'view/calendar_view.dart';
@@ -44,7 +44,7 @@ class MyApp extends StatelessWidget {
         Locale('en', 'US'), // 英語
       ],
       locale: const Locale('ja', 'JP'),
-      home: const LoginPage(),
+      home: const MainPage(),
     );
   }
 }

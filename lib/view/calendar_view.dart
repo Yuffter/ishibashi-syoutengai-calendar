@@ -4,10 +4,10 @@ import 'package:table_calendar/table_calendar.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import '../widget/store_image_form_modal.dart';
 import 'package:hackathon/model/store_image.dart';
-import 'package:hackathon/view_model/store_image_view_model.dart';
+import 'package:hackathon/view_model/store_image.dart';
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class MainPage extends StatelessWidget {
+  const MainPage({super.key});
 
   @override
   Widget build(BuildContext context) {
