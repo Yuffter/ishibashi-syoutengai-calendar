@@ -7,6 +7,7 @@ import '../widget/store_image_form_modal.dart';
 import 'package:hackathon/model/store_image.dart';
 import 'package:hackathon/view_model/store_image.dart';
 import 'login_page.dart';
+import 'event-detail-view.dart';
 
 class MainPage extends StatelessWidget {
   const MainPage({super.key});
@@ -152,31 +153,53 @@ class _TableCalendarSampleState extends ConsumerState<TableCalendarSample> {
                   itemCount: filtered.length,
                   itemBuilder: (context, index) {
                     final item = filtered[index];
-                    return Card(
-                      margin: const EdgeInsets.all(12),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Image.network(
-                            item.imageUrl,
-                            height: 180,
-                            width: double.infinity,
-                            fit: BoxFit.cover,
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(item.title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                                const SizedBox(height: 4),
-                                Text(item.description),
-                                const SizedBox(height: 4),
-                                Text('店舗名: ${item.storeName}'),
-                              ],
+                    return GestureDetector(
+                      onTap: () {
+                        showModalBottomSheet(
+                          context: context,
+                          isScrollControlled: true,
+                          backgroundColor: Colors.transparent,
+                          builder: (context) {
+                            return FractionallySizedBox(
+                              heightFactor: 0.90,
+                              widthFactor: 1.0,
+                              child: Container(
+                                decoration: const BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                                ),
+                                child: EventDetailView(event: item),
+                              ),
+                            );
+                          },
+                        );
+                      },
+                      child: Card(
+                        margin: const EdgeInsets.all(12),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Image.network(
+                              item.imageUrl,
+                              height: 180,
+                              width: double.infinity,
+                              fit: BoxFit.cover,
                             ),
-                          ),
-                        ],
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(item.title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                                  const SizedBox(height: 4),
+                                  Text(item.description),
+                                  const SizedBox(height: 4),
+                                  Text('店舗名: ${item.storeName}'),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     );
                   },
