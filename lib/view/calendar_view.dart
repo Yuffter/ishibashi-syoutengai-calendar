@@ -191,11 +191,33 @@ class _TableCalendarSampleState extends ConsumerState<TableCalendarSample> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(item.title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                                  const SizedBox(height: 4),
-                                  Text(item.description),
-                                  const SizedBox(height: 4),
-                                  Text('店舗名: ${item.storeName}'),
+                                  Text('店舗名: ${item.storeName}',style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
+                                  const SizedBox(height: 2),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        item.title,
+                                        style: TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.grey[700]!,
+                                        ),
+                                      ),
+                                      Text(
+                                        ' ${item.eventDate.month}月${item.eventDate.day}日',
+                                        style: TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.grey[700]!,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  // const SizedBox(height: 4),
+                                  // Text(item.description),
+                                  // const SizedBox(height: 4),
+                                  // Text('店舗名: ${item.storeName}'),
                                 ],
                               ),
                             ),
