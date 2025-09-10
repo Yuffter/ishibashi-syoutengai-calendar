@@ -155,11 +155,23 @@ class _TableCalendarSampleState extends ConsumerState<TableCalendarSample> {
                     final item = filtered[index];
                     return GestureDetector(
                       onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => EventDetailView(event: item),
-                          ),
+                        showModalBottomSheet(
+                          context: context,
+                          isScrollControlled: true,
+                          backgroundColor: Colors.transparent,
+                          builder: (context) {
+                            return FractionallySizedBox(
+                              heightFactor: 0.90,
+                              widthFactor: 1.0,
+                              child: Container(
+                                decoration: const BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                                ),
+                                child: EventDetailView(event: item),
+                              ),
+                            );
+                          },
                         );
                       },
                       child: Card(
