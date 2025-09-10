@@ -64,145 +64,155 @@ class LoginPage extends ConsumerWidget {
     });
 
     return Scaffold(
-      body: Center(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: <Widget>[
-              const SizedBox(height: 60),
-              const Text(
-                '石橋商店街カレンダー',
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 36, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 60),
-              const Text(
-                'アプリへのログイン',
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 8),
-              const Text(
-                'このアプリにログインするには\nメールアドレスとパスワードを入力してください',
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 16, color: Colors.grey),
-              ),
-              const SizedBox(height: 32),
-
-              // メールアドレス入力欄
-              TextField(
-                decoration: const InputDecoration(
-                  labelText: 'メールアドレス',
-                  prefixIcon: Icon(Icons.email),
-                  border: OutlineInputBorder(),
-                ),
-                keyboardType: TextInputType.emailAddress,
-                onChanged: (value) {
-                  // 入力値をProviderに保存
-                  ref.read(userLoginInputViewModelProvider.notifier).updateMail(value);
-                },
-              ),
-              const SizedBox(height: 16),
-
-              // パスワード入力欄
-              TextField(
-                obscureText: !isPasswordVisible, // Providerの値で表示/非表示を切り替え
-                decoration: InputDecoration(
-                  labelText: 'パスワード',
-                  prefixIcon: const Icon(Icons.lock),
-                  border: const OutlineInputBorder(),
-                  suffixIcon: IconButton(
-                    icon: Icon(
-                      isPasswordVisible
-                          ? Icons.visibility
-                          : Icons.visibility_off,
+      body: Stack(
+        children: [
+          Center(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(24.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: <Widget>[
+                  const SizedBox(height: 60),
+                  const Text(
+                    '石橋商店街カレンダー',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 36, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 60),
+                  const Text(
+                    'アプリへのログイン',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 8),
+                  const Text(
+                    'このアプリにログインするには\nメールアドレスとパスワードを入力してください',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 16, color: Colors.grey),
+                  ),
+                  const SizedBox(height: 32),
+                  // メールアドレス入力欄
+                  TextField(
+                    decoration: const InputDecoration(
+                      labelText: 'メールアドレス',
+                      prefixIcon: Icon(Icons.email),
+                      border: OutlineInputBorder(),
                     ),
-                    onPressed: () {
-                      // アイコンが押されたら、表示/非表示の状態を反転させる
-                      ref
-                          .read(passwordVisibilityProvider.notifier)
-                          .update((state) => !state);
+                    keyboardType: TextInputType.emailAddress,
+                    onChanged: (value) {
+                      // 入力値をProviderに保存
+                      ref.read(userLoginInputViewModelProvider.notifier).updateMail(value);
                     },
                   ),
-                ),
-                onChanged: (value) {
-                  // 入力値をProviderに保存
-                  ref.read(userLoginInputViewModelProvider.notifier).updatePassword(value);
-                },
-              ),
-              const SizedBox(height: 24),
-
-              // ログインボタン
-              SizedBox(
-                height: 48,
-                child: ElevatedButton(
-                  onPressed: () {
-                    // ログイン処理
-                    print('ログイン試行 Email: ${userLoginInput.mailAddress}, Password: ${userLoginInput.password}');
-                    ref.read(loginViewModelProvider.notifier)
-                      .login(userLoginInput.mailAddress, userLoginInput.password);
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.black,
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
+                  const SizedBox(height: 16),
+                  // パスワード入力欄
+                  TextField(
+                    obscureText: !isPasswordVisible, // Providerの値で表示/非表示を切り替え
+                    decoration: InputDecoration(
+                      labelText: 'パスワード',
+                      prefixIcon: const Icon(Icons.lock),
+                      border: const OutlineInputBorder(),
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          isPasswordVisible
+                              ? Icons.visibility
+                              : Icons.visibility_off,
+                        ),
+                        onPressed: () {
+                          // アイコンが押されたら、表示/非表示の状態を反転させる
+                          ref
+                              .read(passwordVisibilityProvider.notifier)
+                              .update((state) => !state);
+                        },
+                      ),
+                    ),
+                    onChanged: (value) {
+                      // 入力値をProviderに保存
+                      ref.read(userLoginInputViewModelProvider.notifier).updatePassword(value);
+                    },
+                  ),
+                  const SizedBox(height: 24),
+                  // ログインボタン
+                  SizedBox(
+                    height: 48,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        // ログイン処理
+                        print('ログイン試行 Email: ${userLoginInput.mailAddress}, Password: ${userLoginInput.password}');
+                        ref.read(loginViewModelProvider.notifier)
+                          .login(userLoginInput.mailAddress, userLoginInput.password);
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.black,
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      child: const Text('ログイン', style: TextStyle(fontSize: 18)),
                     ),
                   ),
-                  child: const Text('ログイン', style: TextStyle(fontSize: 18)),
-                ),
-              ),
-              const SizedBox(height: 16),
-
-              // 利用規約とプライバシーポリシー
-              Text.rich(
-                TextSpan(
-                  text: '「ログイン」をクリックすることで、',
-                  style: const TextStyle(fontSize: 12, color: Colors.grey),
-                  children: [
+                  const SizedBox(height: 16),
+                  // 利用規約とプライバシーポリシー
+                  Text.rich(
                     TextSpan(
-                      text: '利用規約',
-                      style: const TextStyle(
-                        color: Colors.blue,
-                        decoration: TextDecoration.underline,
-                      ),
-                      recognizer: TapGestureRecognizer()
-                        ..onTap = () {
-                          // 利用規約ページに遷移
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (context) => const TermsOfServicePage(),
-                            ),
-                          );
-                        },
+                      text: '「ログイン」をクリックすることで、',
+                      style: const TextStyle(fontSize: 12, color: Colors.grey),
+                      children: [
+                        TextSpan(
+                          text: '利用規約',
+                          style: const TextStyle(
+                            color: Colors.blue,
+                            decoration: TextDecoration.underline,
+                          ),
+                          recognizer: TapGestureRecognizer()
+                            ..onTap = () {
+                              // 利用規約ページに遷移
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (context) => const TermsOfServicePage(),
+                                ),
+                              );
+                            },
+                        ),
+                        const TextSpan(text: 'と'),
+                        TextSpan(
+                          text: 'プライバシーポリシー',
+                          style: const TextStyle(
+                            color: Colors.blue,
+                            decoration: TextDecoration.underline,
+                          ),
+                          recognizer: TapGestureRecognizer()
+                            ..onTap = () {
+                              // プライバシーポリシーページに遷移
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (context) => const PrivacyPolicyPage(),
+                                ),
+                              );
+                            },
+                        ),
+                        const TextSpan(text: 'に同意したことになります。'),
+                      ],
                     ),
-                    const TextSpan(text: 'と'),
-                    TextSpan(
-                      text: 'プライバシーポリシー',
-                      style: const TextStyle(
-                        color: Colors.blue,
-                        decoration: TextDecoration.underline,
-                      ),
-                      recognizer: TapGestureRecognizer()
-                        ..onTap = () {
-                          // プライバシーポリシーページに遷移
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (context) => const PrivacyPolicyPage(),
-                            ),
-                          );
-                        },
-                    ),
-                    const TextSpan(text: 'に同意したことになります。'),
-                  ],
-                ),
-                textAlign: TextAlign.center,
+                    textAlign: TextAlign.center,
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
-        ),
+          Positioned(
+            top: 16,
+            left: 16,
+            child: IconButton(
+              icon: const Icon(Icons.arrow_back),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
