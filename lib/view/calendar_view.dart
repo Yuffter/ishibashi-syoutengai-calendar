@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hackathon/view_model/user_status.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import '../widget/store_image_form_modal.dart';
 import 'package:hackathon/model/store_image.dart';
 import 'package:hackathon/view_model/store_image.dart';
+import 'login_page.dart';
 
 class MainPage extends StatelessWidget {
   const MainPage({super.key});
@@ -18,19 +20,26 @@ class MainPage extends StatelessWidget {
   }
 }
 
-class TableCalendarSample extends StatefulWidget {
+class TableCalendarSample extends ConsumerStatefulWidget {
   const TableCalendarSample({super.key});
 
   @override
-  State<TableCalendarSample> createState() => _TableCalendarSampleState();
+  ConsumerState<TableCalendarSample> createState() => _TableCalendarSampleState();
 }
 
-class _TableCalendarSampleState extends State<TableCalendarSample> {
+class _TableCalendarSampleState extends ConsumerState<TableCalendarSample> {
   DateTime _focusedDay = DateTime.now();
   DateTime _selectedDay = DateTime.now();
 
   @override
   Widget build(BuildContext context) {
+    final user_status_notifier = ref.watch(userStatusViewModelProvider.notifier);
+    final isLoggedIn = ref.watch(userStatusViewModelProvider).isLoggedIn;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (isLoggedIn == true && Navigator.canPop(context)) {
+        Navigator.pop(context);
+      }
+    });
     return Scaffold(
       appBar: AppBar(
         title: const Text('カレンダー'),
@@ -54,7 +63,33 @@ class _TableCalendarSampleState extends State<TableCalendarSample> {
             //   showStoreImageFormModal(context);
             // },
             onPressed: () {
-              showStoreImageFormModal(context);
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const LoginPage(),
+                  ),
+              // showStoreImageFormModal(context);
+              // showDialog(
+              //   context: context,
+              //   builder: (context) {
+              //     return AlertDialog(
+              //       title: Text("タイトル"),
+              //       content: Text('ログイン状態: ${user_status.isLoggedIn}'),
+              //       actions: [
+              //         TextButton(
+              //           child: Text("Cancel"),
+              //           onPressed: () => Navigator.pop(context),
+              //         ),
+              //         TextButton(
+              //           child: Text("OK"),
+              //           onPressed: () => Navigator.pop(context),
+              //         ),
+              //       ],
+              //     );
+              //   },
+              // );
+              // LoginPage();
+              // showStoreImageFormModal(context);
               // showModalBottomSheet(
               //   context: context,
               //   isScrollControlled: true,
@@ -65,7 +100,7 @@ class _TableCalendarSampleState extends State<TableCalendarSample> {
               //       child: Text('テスト用のモーダル'),
               //     ),
               //   ),
-              // );
+              );
             },
           ),
         ],
@@ -136,6 +171,25 @@ class _TableCalendarSampleState extends State<TableCalendarSample> {
           ),
         ],
       ),
+      floatingActionButton: isLoggedIn == true
+          ? Padding(
+              padding: const EdgeInsets.only(right: 5, bottom: 5),
+              child: SizedBox(
+                width: 72,
+                height: 72,
+                child: FloatingActionButton(
+                  onPressed: () {
+                    showStoreImageFormModal(context);
+                  },
+                  backgroundColor: Colors.white,
+                  child: const Icon(
+                    Icons.add,
+                    size: 36,
+                  ),
+                ),
+              ),
+            )
+          : null,
     );
   }
 }
