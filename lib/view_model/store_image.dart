@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hackathon/model/store_image.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 // StoreImageの状態を管理するState
 class StoreImageState {
@@ -28,7 +29,36 @@ class StoreImageState {
 
 // StoreImageViewModel
 class StoreImageViewModel extends StateNotifier<StoreImageState> {
-  StoreImageViewModel() : super(const StoreImageState());
+  StoreImageViewModel() : super(const StoreImageState()) {
+    fetchImages();
+  }
+
+  Future<void> fetchImages() async {
+    try {
+      state = state.copyWith(isLoading: true);
+
+      final snapshot = await FirebaseFirestore.instance
+          .collection('events')
+          .orderBy('date', descending: true)
+          .get();
+
+      final images = snapshot.docs.map((doc) {
+        final data = doc.data();
+        return StoreImageModel(
+          id: doc.id,
+          imageUrl: data['url'] ?? '',
+          storeName: data['shop_name'] ?? '',
+          eventDate: (data['date'] as Timestamp).toDate(),
+          title: data['title'] ?? '',
+          description: data['description'] ?? '',
+        );
+      }).toList();
+
+      state = state.copyWith(images: images, isLoading: false);
+    } catch (e) {
+      state = state.copyWith(isLoading: false, error: e.toString());
+    }
+  }
 
   // 画像情報を追加
   void addStoreImage(StoreImageModel storeImage) {

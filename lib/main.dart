@@ -1,7 +1,7 @@
-// lib/main.dart
+import 'package:intl/date_symbol_data_local.dart';import 'firebase_options.dart';
 import 'package:flutter/material.dart';
-// Riverpodをインポート
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'view/calendar_view.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'view/login_page.dart';
