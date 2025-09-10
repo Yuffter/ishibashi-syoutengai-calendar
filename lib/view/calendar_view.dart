@@ -172,13 +172,23 @@ class _TableCalendarSampleState extends ConsumerState<TableCalendarSample> {
         ],
       ),
       floatingActionButton: isLoggedIn == true
-          ? FloatingActionButton(
-        onPressed: () {
-          showStoreImageFormModal(context);
-        },
-        backgroundColor: Colors.blue,
-        child: const Icon(Icons.add),
-      )
+          ? Padding(
+              padding: const EdgeInsets.only(right: 5, bottom: 5),
+              child: SizedBox(
+                width: 72,
+                height: 72,
+                child: FloatingActionButton(
+                  onPressed: () {
+                    showStoreImageFormModal(context);
+                  },
+                  backgroundColor: Colors.white,
+                  child: const Icon(
+                    Icons.add,
+                    size: 36,
+                  ),
+                ),
+              ),
+            )
           : null,
     );
   }
