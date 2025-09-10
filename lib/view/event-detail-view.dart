@@ -4,7 +4,6 @@ import 'calendar_view.dart';
 
 class EventDetailView extends StatelessWidget {
   final StoreImageModel event;
-
   const EventDetailView({super.key, required this.event});
 
   @override
@@ -15,19 +14,73 @@ class EventDetailView extends StatelessWidget {
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('タイトル: ${event.title}', style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 12),
-            Text('説明: ${event.description}', style: const TextStyle(fontSize: 16)),
-            const SizedBox(height: 12),
-            Text('店舗名: ${event.storeName}', style: const TextStyle(fontSize: 16)),
-            const SizedBox(height: 12),
-            Text('開催日: ${event.eventDate.toLocal().toString().split(' ')[0]}', style: const TextStyle(fontSize: 16)),
-            const SizedBox(height: 12),
-            Image.network(event.imageUrl, height: 200, fit: BoxFit.cover),
-          ],
+        child: Center(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: Container(
+                  constraints: BoxConstraints(
+                    maxHeight: MediaQuery.of(context).size.height * 0.3,
+                    maxWidth: 400,
+                  ),
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: Colors.grey[600]!,
+                      width: 4.0,
+                    ),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(16),
+                    child: Image.network(
+                      event.imageUrl,
+                      height: 400,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(height: 8),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        '店舗名: ${event.storeName}',
+                        style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                    Expanded(
+                      child: Text(
+                        '開催日: ${event.eventDate.toLocal().toString().split(' ')[0]}',
+                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                        textAlign: TextAlign.right,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 12),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                child: Text(
+                  '${event.title}',
+                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+              ),
+              const SizedBox(height: 12),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                child: Text(
+                  '${event.description}',
+                  style: const TextStyle(fontSize: 16),
+                ),
+              ),
+              const SizedBox(height: 12),
+            ],
+          ),
         ),
       ),
     );
