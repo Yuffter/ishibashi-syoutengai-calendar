@@ -5,7 +5,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'view/login_page.dart';
-import 'package:hackathon/widget/store_image_form_modal.dart';
 import 'firebase_options.dart';
 
 void main() async {
