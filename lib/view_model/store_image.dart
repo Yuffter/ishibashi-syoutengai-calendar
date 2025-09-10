@@ -1,34 +1,44 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hackathon/model/store_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:hive/hive.dart';
 
 // StoreImageの状態を管理するState
 class StoreImageState {
   final List<StoreImageModel> images;
   final bool isLoading;
   final String? error;
+  final DateTime? lastFetched;
 
   const StoreImageState({
     this.images = const [],
     this.isLoading = false,
     this.error,
+    this.lastFetched,
   });
 
   StoreImageState copyWith({
     List<StoreImageModel>? images,
     bool? isLoading,
     String? error,
+    DateTime? lastFetched,
   }) {
     return StoreImageState(
       images: images ?? this.images,
       isLoading: isLoading ?? this.isLoading,
       error: error ?? this.error,
+      lastFetched: lastFetched ?? this.lastFetched,
     );
   }
 }
 
 // StoreImageViewModel
 class StoreImageViewModel extends StateNotifier<StoreImageState> {
+  static const String _cacheBoxName = 'store_images_cache';
+  static const String _cacheKey = 'images_data';
+  static const String _timestampKey = 'last_fetch_timestamp';
+  static const Duration _cacheExpiration = Duration(minutes: 30); // 30分キャッシュ
+
   StoreImageViewModel() : super(const StoreImageState()) {
     fetchImages();
   }
@@ -37,6 +47,22 @@ class StoreImageViewModel extends StateNotifier<StoreImageState> {
     try {
       state = state.copyWith(isLoading: true);
 
+      // キャッシュが有効かチェック
+      if (await _isCacheValid()) {
+        final cachedImages = await _loadFromCache();
+        print('キャッシュから読み込み');
+        if (cachedImages.isNotEmpty) {
+          final lastFetched = await _getLastFetchTime();
+          state = state.copyWith(
+            images: cachedImages,
+            isLoading: false,
+            lastFetched: lastFetched,
+          );
+          return;
+        }
+      }
+
+      // Firestoreから取得
       final snapshot = await FirebaseFirestore.instance
           .collection('events')
           .orderBy('date', descending: true)
@@ -54,9 +80,104 @@ class StoreImageViewModel extends StateNotifier<StoreImageState> {
         );
       }).toList();
 
-      state = state.copyWith(images: images, isLoading: false);
+      // キャッシュに保存
+      await _saveToCache(images);
+      final now = DateTime.now();
+
+      state = state.copyWith(
+        images: images,
+        isLoading: false,
+        lastFetched: now,
+      );
     } catch (e) {
       state = state.copyWith(isLoading: false, error: e.toString());
+    }
+  }
+
+  // キャッシュが有効かどうかをチェック
+  Future<bool> _isCacheValid() async {
+    try {
+      final box = await Hive.openBox(_cacheBoxName);
+      final timestamp = box.get(_timestampKey);
+      if (timestamp == null) return false;
+
+      final lastFetch = DateTime.fromMillisecondsSinceEpoch(timestamp);
+      final now = DateTime.now();
+      return now.difference(lastFetch) < _cacheExpiration;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  // キャッシュからデータを読み込み
+  Future<List<StoreImageModel>> _loadFromCache() async {
+    try {
+      final box = await Hive.openBox(_cacheBoxName);
+      final cachedData = box.get(_cacheKey);
+      if (cachedData == null) return [];
+
+      return (cachedData as List).map((item) {
+        final data = Map<String, dynamic>.from(item);
+        return StoreImageModel(
+          id: data['id'] ?? '',
+          imageUrl: data['imageUrl'] ?? '',
+          storeName: data['storeName'] ?? '',
+          eventDate: DateTime.fromMillisecondsSinceEpoch(
+            data['eventDate'] ?? 0,
+          ),
+          title: data['title'] ?? '',
+          description: data['description'] ?? '',
+        );
+      }).toList();
+    } catch (e) {
+      return [];
+    }
+  }
+
+  // キャッシュにデータを保存
+  Future<void> _saveToCache(List<StoreImageModel> images) async {
+    try {
+      final box = await Hive.openBox(_cacheBoxName);
+      final cacheData = images
+          .map(
+            (image) => {
+              'id': image.id,
+              'imageUrl': image.imageUrl,
+              'storeName': image.storeName,
+              'eventDate': image.eventDate.millisecondsSinceEpoch,
+              'title': image.title,
+              'description': image.description,
+            },
+          )
+          .toList();
+
+      await box.put(_cacheKey, cacheData);
+      await box.put(_timestampKey, DateTime.now().millisecondsSinceEpoch);
+    } catch (e) {
+      // キャッシュ保存に失敗しても処理は続行
+      print('Cache save failed: $e');
+    }
+  }
+
+  // 最終取得時刻を取得
+  Future<DateTime?> _getLastFetchTime() async {
+    try {
+      final box = await Hive.openBox(_cacheBoxName);
+      final timestamp = box.get(_timestampKey);
+      if (timestamp == null) return null;
+      return DateTime.fromMillisecondsSinceEpoch(timestamp);
+    } catch (e) {
+      return null;
+    }
+  }
+
+  // キャッシュを強制的にクリア
+  Future<void> clearCache() async {
+    try {
+      final box = await Hive.openBox(_cacheBoxName);
+      await box.clear();
+    } catch (e) {
+      print('Cache clear failed: $e');
     }
   }
 
