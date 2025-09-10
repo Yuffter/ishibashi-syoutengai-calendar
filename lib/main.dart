@@ -1,12 +1,11 @@
-// lib/main.dart
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:flutter/material.dart';
-// Riverpodをインポート
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'firebase_options.dart';
-import 'view/login_page.dart';
+import 'view/calendar_view.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:hackathon/widget/store_image_form_modal.dart';
+import 'view/login_page.dart';
+import 'firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -30,9 +29,9 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: '石橋商店街カレンダー',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
         useMaterial3: true,
       ),
       localizationsDelegates: const [
@@ -40,37 +39,12 @@ class MyApp extends StatelessWidget {
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
-      supportedLocales: const [Locale('ja', 'JP'), Locale('en', 'US')],
+      supportedLocales: const [
+        Locale('ja', 'JP'), // 日本語
+        Locale('en', 'US'), // 英語
+      ],
       locale: const Locale('ja', 'JP'),
-      home: const MyHomePage(title: 'Firebase Storage 画像アップロード'),
-    );
-  }
-}
-
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  final String title;
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(widget.title),
-        centerTitle: true,
-      ),
-      body: ElevatedButton(
-        onPressed: () {
-          showStoreImageFormModal(context);
-        },
-        child: const Text('画像をアップロード'),
-      ),
+      home: const MainPage(),
     );
   }
 }

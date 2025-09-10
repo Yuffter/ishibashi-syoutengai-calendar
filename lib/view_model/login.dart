@@ -2,9 +2,9 @@
 import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import '../model/auth_user.dart';
+import '../model/firebase_auth.dart';
 
-part 'login_view_model.g.dart';
+part 'login.g.dart';
 
 @riverpod
 class LoginViewModel extends _$LoginViewModel {
@@ -14,7 +14,7 @@ class LoginViewModel extends _$LoginViewModel {
     return null;
   }
 
-  // ログイン処理
+  /// ログイン処理
   Future<void> login(String email, String password) async {
     // ローディング状態に設定
     state = const AsyncValue.loading();
@@ -30,7 +30,7 @@ class LoginViewModel extends _$LoginViewModel {
     });
   }
 
-  // サインアウト処理
+  /// サインアウト処理
   Future<void> signOut() async {
     final auth = ref.read(firebaseAuthProvider);
     await auth.signOut();

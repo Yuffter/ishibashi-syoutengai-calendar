@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hackathon/model/store_image.dart';
-import 'package:hackathon/view_model/store_image_view_model.dart';
+import 'package:hackathon/view_model/store_image.dart';
 import 'package:image_picker_web/image_picker_web.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -199,7 +199,7 @@ class _StoreImageFormModalState extends ConsumerState<StoreImageFormModal> {
 
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text('保存に失敗しました: $e')));
+        ).showSnackBar(SnackBar(content: Text('保存に失敗しました: ${e.toString()}')));
       }
     }
   }
@@ -436,9 +436,12 @@ Future<void> showStoreImageFormModal(
     isScrollControlled: true,
     backgroundColor: Colors.transparent,
     builder: (BuildContext context) {
-      return StoreImageFormModal(
-        existingImage: existingImage,
-        presetImageUrl: presetImageUrl,
+      return Container(
+        height: 800,
+        child: StoreImageFormModal(
+          existingImage: existingImage,
+          presetImageUrl: presetImageUrl,
+        ),
       );
     },
   );
