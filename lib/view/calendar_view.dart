@@ -68,48 +68,12 @@ class _TableCalendarSampleState extends ConsumerState<TableCalendarSample> {
                 color: Colors.black,
               ),
             ),
-            // onPressed: () {
-            //   // TODO: Add action
-            //   showStoreImageFormModal(context);
-            // },
             onPressed: () {
               Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (context) => const LoginPage(),
                   ),
-              // showStoreImageFormModal(context);
-              // showDialog(
-              //   context: context,
-              //   builder: (context) {
-              //     return AlertDialog(
-              //       title: Text("タイトル"),
-              //       content: Text('ログイン状態: ${user_status.isLoggedIn}'),
-              //       actions: [
-              //         TextButton(
-              //           child: Text("Cancel"),
-              //           onPressed: () => Navigator.pop(context),
-              //         ),
-              //         TextButton(
-              //           child: Text("OK"),
-              //           onPressed: () => Navigator.pop(context),
-              //         ),
-              //       ],
-              //     );
-              //   },
-              // );
-              // LoginPage();
-              // showStoreImageFormModal(context);
-              // showModalBottomSheet(
-              //   context: context,
-              //   isScrollControlled: true,
-              //   builder: (_) => Container(
-              //     height: 300,
-              //     color: Colors.white,
-              //     child: const Center(
-              //       child: Text('テスト用のモーダル'),
-              //     ),
-              //   ),
               );
             },
           ),
