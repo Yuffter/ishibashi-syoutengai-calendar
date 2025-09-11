@@ -122,7 +122,7 @@ class _TableCalendarSampleState extends ConsumerState<TableCalendarSample> {
                 if (!hasEvent) return const SizedBox.shrink();
 
                 return Positioned(
-                  bottom: -4,
+                  bottom: 0,
                   child: Container(
                     width: 7,
                     height: 7,
@@ -250,22 +250,44 @@ class _TableCalendarSampleState extends ConsumerState<TableCalendarSample> {
                                   ),
                                 ),
                                 Padding(
-                                  padding: const EdgeInsets.all(8.0),
+                                  padding: const EdgeInsets.all(12.0),
                                   child: Column(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
+                                      // 1行目：店舗名
                                       Text(
-                                        item.title,
+                                        '店舗名: ${item.storeName}',
                                         style: const TextStyle(
-                                          fontSize: 18,
+                                          fontSize: 16,
                                           fontWeight: FontWeight.bold,
                                         ),
                                       ),
-                                      const SizedBox(height: 4),
-                                      Text(item.description),
-                                      const SizedBox(height: 4),
-                                      Text('店舗名: ${item.storeName}'),
+                                      const SizedBox(height: 8),
+                                      // 2行目：タイトルと日付
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Expanded(
+                                            child: Text(
+                                              item.title,
+                                              style: const TextStyle(
+                                                fontSize: 20,
+                                                color: Color.fromARGB(255, 112, 112, 112),
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                          ),
+                                          Text(
+                                            '${item.eventDate.month}月${item.eventDate.day}日',
+                                            style: const TextStyle(
+                                              fontSize: 18,
+                                              color: Colors.grey,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
                                     ],
                                   ),
                                 ),
