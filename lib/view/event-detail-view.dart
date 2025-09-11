@@ -12,9 +12,7 @@ class EventDetailView extends StatelessWidget {
       appBar: AppBar(
         title: const Text(
           'イベント詳細',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-          ),
+          style: TextStyle(fontWeight: FontWeight.bold),
         ),
       ),
       body: Padding(
@@ -30,10 +28,7 @@ class EventDetailView extends StatelessWidget {
                     maxWidth: 400,
                   ),
                   decoration: BoxDecoration(
-                    border: Border.all(
-                      color: Colors.grey[600]!,
-                      width: 4.0,
-                    ),
+                    border: Border.all(color: Colors.grey[600]!, width: 4.0),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: ClipRRect(
@@ -41,7 +36,54 @@ class EventDetailView extends StatelessWidget {
                     child: Image.network(
                       event.imageUrl,
                       height: 400,
-                      fit: BoxFit.cover,
+                      fit: BoxFit.contain,
+                      loadingBuilder: (context, child, loadingProgress) {
+                        if (loadingProgress == null) return child;
+                        return Container(
+                          height: 400,
+                          decoration: BoxDecoration(
+                            color: Colors.grey[200],
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          child: Center(
+                            child: CircularProgressIndicator(
+                              value: loadingProgress.expectedTotalBytes != null
+                                  ? loadingProgress.cumulativeBytesLoaded /
+                                        loadingProgress.expectedTotalBytes!
+                                  : null,
+                            ),
+                          ),
+                        );
+                      },
+                      errorBuilder: (context, error, stackTrace) {
+                        return Container(
+                          height: 400,
+                          decoration: BoxDecoration(
+                            color: Colors.grey[300],
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          child: const Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.broken_image,
+                                size: 60,
+                                color: Colors.grey,
+                              ),
+                              SizedBox(height: 8),
+                              Text(
+                                '画像を読み込めませんでした',
+                                style: TextStyle(
+                                  color: Colors.grey,
+                                  fontSize: 16,
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                      filterQuality: FilterQuality.high,
+                      isAntiAlias: true,
                     ),
                   ),
                 ),
@@ -54,13 +96,19 @@ class EventDetailView extends StatelessWidget {
                     Expanded(
                       child: Text(
                         '店舗名: ${event.storeName}',
-                        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
                     Expanded(
                       child: Text(
                         '開催日: ${event.eventDate.toLocal().toString().split(' ')[0]}',
-                        style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                        style: const TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.bold,
+                        ),
                         textAlign: TextAlign.right,
                       ),
                     ),
@@ -72,7 +120,10 @@ class EventDetailView extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 20.0),
                 child: Text(
                   '${event.title}',
-                  style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
+                  style: const TextStyle(
+                    fontSize: 17,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
               const SizedBox(height: 12),
