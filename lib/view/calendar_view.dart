@@ -2,9 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hackathon/view_model/user_status.dart';
 import 'package:table_calendar/table_calendar.dart';
-import 'package:intl/date_symbol_data_local.dart';
 import '../widget/store_image_form_modal.dart';
-import 'package:hackathon/model/store_image.dart';
 import 'package:hackathon/view_model/store_image.dart';
 import 'login_page.dart';
 import 'event-detail-view.dart';
@@ -154,52 +152,126 @@ class _TableCalendarSampleState extends ConsumerState<TableCalendarSample> {
                   itemCount: filtered.length,
                   itemBuilder: (context, index) {
                     final item = filtered[index];
-                    return GestureDetector(
-                      onTap: () {
-                        showModalBottomSheet(
-                          context: context,
-                          isScrollControlled: true,
-                          backgroundColor: Colors.transparent,
-                          builder: (context) {
-                            return FractionallySizedBox(
-                              heightFactor: 0.90,
-                              widthFactor: 1.0,
-                              child: Container(
-                                decoration: const BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-                                ),
-                                child: EventDetailView(event: item),
-                              ),
+                    return Center(
+                      child: Container(
+                        constraints: const BoxConstraints(maxWidth: 600),
+                        child: GestureDetector(
+                          onTap: () {
+                            showModalBottomSheet(
+                              context: context,
+                              isScrollControlled: true,
+                              backgroundColor: Colors.transparent,
+                              builder: (context) {
+                                return FractionallySizedBox(
+                                  heightFactor: 0.90,
+                                  widthFactor: 1.0,
+                                  child: Container(
+                                    decoration: const BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.vertical(
+                                        top: Radius.circular(20),
+                                      ),
+                                    ),
+                                    child: EventDetailView(event: item),
+                                  ),
+                                );
+                              },
                             );
                           },
-                        );
-                      },
-                      child: Card(
-                        margin: const EdgeInsets.all(12),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Image.network(
-                              item.imageUrl,
-                              height: 180,
-                              width: double.infinity,
-                              fit: BoxFit.cover,
+                          child: Card(
+                            margin: const EdgeInsets.all(12),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                ClipRRect(
+                                  borderRadius: const BorderRadius.vertical(
+                                    top: Radius.circular(12),
+                                  ),
+                                  child: SizedBox(
+                                    height: 200,
+                                    child: Image.network(
+                                      item.imageUrl,
+                                      width: double.infinity,
+                                      fit: BoxFit.contain,
+                                      loadingBuilder: (context, child, loadingProgress) {
+                                        if (loadingProgress == null)
+                                          return child;
+                                        return Container(
+                                          width: double.infinity,
+                                          height: 180,
+                                          decoration: BoxDecoration(
+                                            color: Colors.grey[200],
+                                          ),
+                                          child: Center(
+                                            child: CircularProgressIndicator(
+                                              value:
+                                                  loadingProgress
+                                                          .expectedTotalBytes !=
+                                                      null
+                                                  ? loadingProgress
+                                                            .cumulativeBytesLoaded /
+                                                        loadingProgress
+                                                            .expectedTotalBytes!
+                                                  : null,
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                      errorBuilder:
+                                          (context, error, stackTrace) {
+                                            return Container(
+                                              width: double.infinity,
+                                              height: 180,
+                                              decoration: BoxDecoration(
+                                                color: Colors.grey[300],
+                                              ),
+                                              child: const Column(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                children: [
+                                                  Icon(
+                                                    Icons.broken_image,
+                                                    size: 50,
+                                                    color: Colors.grey,
+                                                  ),
+                                                  Text(
+                                                    '画像を読み込めませんでした',
+                                                    style: TextStyle(
+                                                      color: Colors.grey,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            );
+                                          },
+                                      filterQuality: FilterQuality.high,
+                                      isAntiAlias: true,
+                                    ),
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        item.title,
+                                        style: const TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Text(item.description),
+                                      const SizedBox(height: 4),
+                                      Text('店舗名: ${item.storeName}'),
+                                    ],
+                                  ),
+                                ),
+                              ],
                             ),
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(item.title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                                  const SizedBox(height: 4),
-                                  Text(item.description),
-                                  const SizedBox(height: 4),
-                                  Text('店舗名: ${item.storeName}'),
-                                ],
-                              ),
-                            ),
-                          ],
+                          ),
                         ),
                       ),
                     );
