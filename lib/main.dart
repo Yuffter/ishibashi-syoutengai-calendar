@@ -7,6 +7,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'view/login_page.dart';
 import 'firebase_options.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'widget/header.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -46,7 +47,10 @@ class MyApp extends StatelessWidget {
         Locale('en', 'US'), // 英語
       ],
       locale: const Locale('ja', 'JP'),
-      home: const MainPage(),
+      home: const Scaffold(
+        appBar: Header(),
+        body: MainPage(),
+      ),
     );
   }
 }
