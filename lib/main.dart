@@ -8,9 +8,11 @@ import 'view/login_page.dart';
 import 'firebase_options.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'widget/header.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
+  WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+  FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
 
   // Firebase初期化
   try {
