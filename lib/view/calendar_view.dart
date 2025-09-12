@@ -224,50 +224,61 @@ class _TableCalendarSampleState extends ConsumerState<TableCalendarSample> {
                                             ),
                                           ),
                                           if (isLoggedIn == true)
-                                            IconButton(
-                                              icon: const Icon(Icons.close, color: Colors.red),
-                                              onPressed: () async {
-                                                final shouldDelete = await showDialog<bool>(
-                                                  context: context,
-                                                  builder: (ctx) => AlertDialog(
-                                                    title: const Text(
-                                                      '削除の確認',
-                                                      style: TextStyle(fontWeight: FontWeight.bold),
-                                                    ),
-                                                    content: const Text('このイベントを削除してもよろしいですか？'),
-                                                    actions: [
-                                                      Row(
-                                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                        children: [
-                                                          TextButton(
-                                                            onPressed: () => Navigator.pop(ctx, false),
-                                                            child: const Text('キャンセル'),
-                                                          ),
-                                                          TextButton(
-                                                            onPressed: () => Navigator.pop(ctx, true),
-                                                            child: const Text('削除'),
-                                                          ),
-                                                        ],
+                                            Container(
+                                              width: 40,
+                                              height: 40,
+                                              decoration: BoxDecoration(
+                                                border: Border.all(color: Colors.red, width: 1.5),
+                                                shape: BoxShape.circle,
+                                              ),
+                                              child: IconButton(
+                                                icon: const Icon(Icons.close, color: Colors.red, size: 24),
+                                                padding: EdgeInsets.zero,
+                                                onPressed: () async {
+                                                  final shouldDelete = await showDialog<bool>(
+                                                    context: context,
+                                                    builder: (ctx) => AlertDialog(
+                                                      title: const Text(
+                                                        '削除の確認',
+                                                        style: TextStyle(fontWeight: FontWeight.bold),
                                                       ),
-                                                    ],
-                                                  ),
-                                                );
+                                                      content: const Text('このイベントを削除してもよろしいですか？'),
+                                                      actions: [
+                                                        Row(
+                                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                          children: [
+                                                            TextButton(
+                                                              onPressed: () => Navigator.pop(ctx, false),
+                                                              child: const Text('キャンセル'),
+                                                            ),
+                                                            TextButton(
+                                                              onPressed: () => Navigator.pop(ctx, true),
+                                                              child: const Text('削除'),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  );
 
-                                                if (shouldDelete == true) {
-                                                  try {
-                                                    await FirebaseFirestore.instance
-                                                        .collection('storeImages')
-                                                        .doc(item.id)
-                                                        .delete();
+                                                  if (shouldDelete == true) {
+                                                    try {
+                                                      // Firestore のドキュメントを削除
+                                                      await FirebaseFirestore.instance
+                                                          .collection('storeImages')
+                                                          .doc(item.id)
+                                                          .delete();
 
-                                                    ref.read(storeImageViewModelProvider.notifier).removeStoreImage(item.id);
-                                                  } catch (e) {
-                                                    ScaffoldMessenger.of(context).showSnackBar(
-                                                      const SnackBar(content: Text('削除に失敗しました')),
-                                                    );
+                                                      // ローカルステートも更新
+                                                      ref.read(storeImageViewModelProvider.notifier).removeStoreImage(item.id);
+                                                    } catch (e) {
+                                                      ScaffoldMessenger.of(context).showSnackBar(
+                                                        const SnackBar(content: Text('削除に失敗しました')),
+                                                      );
+                                                    }
                                                   }
-                                                }
-                                              },
+                                                },
+                                              ),
                                             ),
                                         ],
                                       ),
