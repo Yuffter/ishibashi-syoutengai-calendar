@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hackathon/model/store_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:hive/hive.dart';
 
 // StoreImageの状態を管理するState
@@ -201,6 +202,44 @@ class StoreImageViewModel extends StateNotifier<StoreImageState> {
         .where((image) => image.id != id)
         .toList();
     state = state.copyWith(images: filteredImages);
+  }
+
+  // Firestoreから画像情報を削除（データベース、Firebase Storage、ローカル状態から削除）
+  Future<bool> deleteStoreImage(String id) async {
+    try {
+      // 削除対象の画像情報を取得
+      final imageToDelete = state.images.firstWhere(
+        (image) => image.id == id,
+        orElse: () => throw Exception('削除対象の画像が見つかりません'),
+      );
+
+      // Firebase Storageから画像を削除
+      if (imageToDelete.imageUrl.isNotEmpty) {
+        try {
+          final storageRef = FirebaseStorage.instance.refFromURL(
+            imageToDelete.imageUrl,
+          );
+          await storageRef.delete();
+        } catch (storageError) {
+          // Storage削除に失敗してもFirestore削除は続行
+          print('Storage削除エラー: $storageError');
+        }
+      }
+
+      // Firestoreから削除
+      await FirebaseFirestore.instance.collection('events').doc(id).delete();
+
+      // ローカル状態からも削除
+      removeStoreImage(id);
+
+      // キャッシュも更新
+      await _saveToCache(state.images);
+
+      return true;
+    } catch (e) {
+      state = state.copyWith(error: 'イベントの削除に失敗しました: $e');
+      return false;
+    }
   }
 
   // 店舗名で検索
