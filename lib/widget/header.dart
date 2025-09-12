@@ -39,29 +39,24 @@ class Header extends ConsumerWidget implements PreferredSizeWidget {
                 context: context,
                 builder: (context) {
                   return AlertDialog(
-                    title: const Text(
-                      'ログイン中',
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                    content: const Text('すでにログインしています'),
+                    title: const Text('ログアウトしますか？'),
+                    content: const Text('現在ログインしています。'),
                     actions: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          TextButton(
-                            onPressed: () {
-                              Navigator.pop(context);
-                            },
-                            child: const Text('閉じる'),
-                          ),
-                          TextButton(
-                            onPressed: () {
-                              user_status.updateLoginStatus(false);
-                              Navigator.pop(context);
-                            },
-                            child: const Text('ログアウト'),
-                          ),
-                        ],
+                      TextButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        child: const Text('キャンセル'),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          // ViewModelのsignOutメソッドを呼び出す
+                          ref.read(loginViewModelProvider.notifier).signOut();
+                          // ログイン状態を更新
+                          ref.read(userStatusViewModelProvider.notifier).updateLoginStatus(false);
+                          Navigator.pop(context);
+                        },
+                        child: const Text('ログアウト'),
                       ),
                     ],
                   );

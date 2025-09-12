@@ -6,7 +6,6 @@ import 'package:table_calendar/table_calendar.dart';
 import '../widget/store_image_form_modal.dart';
 import 'package:hackathon/view_model/store_image.dart';
 import 'event-detail-view.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class MainPage extends StatelessWidget {
@@ -221,86 +220,9 @@ class _TableCalendarSampleState extends ConsumerState<TableCalendarSample> {
                                               ),
                                             );
                                           },
-                                      filterQuality: FilterQuality.high,
-                                      isAntiAlias: true,
-                                    ),
-                                  ),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.all(12.0),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      // 1行目：店舗名
-                                      Row(
-                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Text(
-                                            '店舗名: ${item.storeName}',
-                                            style: const TextStyle(
-                                              fontSize: 16,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                          if (isLoggedIn == true)
-                                            Container(
-                                              width: 40,
-                                              height: 40,
-                                              decoration: BoxDecoration(
-                                                border: Border.all(color: Colors.red, width: 1.5),
-                                                shape: BoxShape.circle,
-                                              ),
-                                              child: IconButton(
-                                                icon: const Icon(Icons.close, color: Colors.red, size: 24),
-                                                padding: EdgeInsets.zero,
-                                                onPressed: () async {
-                                                  final shouldDelete = await showDialog<bool>(
-                                                    context: context,
-                                                    builder: (ctx) => AlertDialog(
-                                                      title: const Text(
-                                                        '削除の確認',
-                                                        style: TextStyle(fontWeight: FontWeight.bold),
-                                                      ),
-                                                      content: const Text('このイベントを削除してもよろしいですか？'),
-                                                      actions: [
-                                                        Row(
-                                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                          children: [
-                                                            TextButton(
-                                                              onPressed: () => Navigator.pop(ctx, false),
-                                                              child: const Text('キャンセル'),
-                                                            ),
-                                                            TextButton(
-                                                              onPressed: () => Navigator.pop(ctx, true),
-                                                              child: const Text('削除'),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  );
-
-                                                  if (shouldDelete == true) {
-                                                    try {
-                                                      // Firestore のドキュメントを削除
-                                                      await FirebaseFirestore.instance
-                                                          .collection('storeImages')
-                                                          .doc(item.id)
-                                                          .delete();
-
-                                                      // ローカルステートも更新
-                                                      ref.read(storeImageViewModelProvider.notifier).removeStoreImage(item.id);
-                                                    } catch (e) {
-                                                      ScaffoldMessenger.of(context).showSnackBar(
-                                                        const SnackBar(content: Text('削除に失敗しました')),
-                                                      );
-                                                    }
-                                                  }
-                                                },
-                                              ),
-                                            ),
-                                        ],
+                                          filterQuality: FilterQuality.high,
+                                          isAntiAlias: true,
+                                        ),
                                       ),
                                     ),
                                     Padding(
