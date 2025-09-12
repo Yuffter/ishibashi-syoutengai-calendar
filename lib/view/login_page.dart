@@ -60,6 +60,8 @@ class LoginPage extends ConsumerWidget {
           context,
         ).showSnackBar(const SnackBar(content: Text('ログインに成功しました')));
         userStatus.updateLoginStatus(true);
+        // ログイン成功時にLoginPageを閉じる
+        Navigator.of(context).pop();
       }
     });
 
@@ -102,7 +104,9 @@ class LoginPage extends ConsumerWidget {
                     keyboardType: TextInputType.emailAddress,
                     onChanged: (value) {
                       // 入力値をProviderに保存
-                      ref.read(userLoginInputViewModelProvider.notifier).updateMail(value);
+                      ref
+                          .read(userLoginInputViewModelProvider.notifier)
+                          .updateMail(value);
                     },
                   ),
                   const SizedBox(height: 16),
@@ -129,7 +133,9 @@ class LoginPage extends ConsumerWidget {
                     ),
                     onChanged: (value) {
                       // 入力値をProviderに保存
-                      ref.read(userLoginInputViewModelProvider.notifier).updatePassword(value);
+                      ref
+                          .read(userLoginInputViewModelProvider.notifier)
+                          .updatePassword(value);
                     },
                   ),
                   const SizedBox(height: 24),
@@ -139,9 +145,15 @@ class LoginPage extends ConsumerWidget {
                     child: ElevatedButton(
                       onPressed: () {
                         // ログイン処理
-                        print('ログイン試行 Email: ${userLoginInput.mailAddress}, Password: ${userLoginInput.password}');
-                        ref.read(loginViewModelProvider.notifier)
-                          .login(userLoginInput.mailAddress, userLoginInput.password);
+                        print(
+                          'ログイン試行 Email: ${userLoginInput.mailAddress}, Password: ${userLoginInput.password}',
+                        );
+                        ref
+                            .read(loginViewModelProvider.notifier)
+                            .login(
+                              userLoginInput.mailAddress,
+                              userLoginInput.password,
+                            );
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.black,
@@ -171,7 +183,8 @@ class LoginPage extends ConsumerWidget {
                               // 利用規約ページに遷移
                               Navigator.of(context).push(
                                 MaterialPageRoute(
-                                  builder: (context) => const TermsOfServicePage(),
+                                  builder: (context) =>
+                                      const TermsOfServicePage(),
                                 ),
                               );
                             },
@@ -188,7 +201,8 @@ class LoginPage extends ConsumerWidget {
                               // プライバシーポリシーページに遷移
                               Navigator.of(context).push(
                                 MaterialPageRoute(
-                                  builder: (context) => const PrivacyPolicyPage(),
+                                  builder: (context) =>
+                                      const PrivacyPolicyPage(),
                                 ),
                               );
                             },

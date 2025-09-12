@@ -4,7 +4,6 @@ import 'package:hackathon/view_model/user_status.dart';
 import 'package:table_calendar/table_calendar.dart';
 import '../widget/store_image_form_modal.dart';
 import 'package:hackathon/view_model/store_image.dart';
-import 'login_page.dart';
 import 'event-detail-view.dart';
 
 class MainPage extends StatelessWidget {
@@ -45,7 +44,6 @@ class _TableCalendarSampleState extends ConsumerState<TableCalendarSample> {
           ),
         )
         .toSet();
-    final user_status = ref.watch(userStatusViewModelProvider.notifier);
     final isLoggedIn = ref.watch(userStatusViewModelProvider).isLoggedIn;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (isLoggedIn == true && Navigator.canPop(context)) {
@@ -53,48 +51,6 @@ class _TableCalendarSampleState extends ConsumerState<TableCalendarSample> {
       }
     });
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('カレンダー'),
-        actions: [
-          IconButton(
-            icon: Container(
-              margin: const EdgeInsets.only(right: 10),
-              padding: const EdgeInsets.all(6),
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: Colors.grey.shade200,
-              ),
-              child: const Icon(Icons.person, size: 26, color: Colors.black),
-            ),
-            onPressed: () {
-              if (user_status.isLoggedIn == true) {
-                showDialog(
-                  context: context,
-                  builder: (context) {
-                    return AlertDialog(
-                      title: const Text('ログイン中'),
-                      content: const Text('すでにログインしています'),
-                      actions: [
-                        TextButton(
-                          onPressed: () {
-                            Navigator.pop(context);
-                          },
-                          child: const Text('閉じる'),
-                        ),
-                      ],
-                    );
-                  },
-                );
-              } else {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const LoginPage()),
-                );
-              }
-            },
-          ),
-        ],
-      ),
       body: Column(
         children: [
           TableCalendar(
@@ -274,7 +230,12 @@ class _TableCalendarSampleState extends ConsumerState<TableCalendarSample> {
                                               item.title,
                                               style: const TextStyle(
                                                 fontSize: 20,
-                                                color: Color.fromARGB(255, 112, 112, 112),
+                                                color: Color.fromARGB(
+                                                  255,
+                                                  112,
+                                                  112,
+                                                  112,
+                                                ),
                                                 fontWeight: FontWeight.bold,
                                               ),
                                             ),
