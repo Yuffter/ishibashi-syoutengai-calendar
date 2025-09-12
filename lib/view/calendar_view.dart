@@ -268,8 +268,8 @@ class _TableCalendarSampleState extends ConsumerState<TableCalendarSample> {
                           child: Container(
                             constraints: const BoxConstraints(maxWidth: 600),
                             child: GestureDetector(
-                              onTap: () {
-                                showModalBottomSheet(
+                              onTap: () async {
+                                final result = await showModalBottomSheet<Map<String, dynamic>>(
                                   context: context,
                                   isScrollControlled: true,
                                   backgroundColor: Colors.transparent,
@@ -289,6 +289,29 @@ class _TableCalendarSampleState extends ConsumerState<TableCalendarSample> {
                                     );
                                   },
                                 );
+
+                                if (result != null && result['deleted'] == true) {
+                                  final id = result['id'] as String?;
+                                  if (id == null) return;
+
+                                  final success = await ref
+                                      .read(storeImageViewModelProvider.notifier)
+                                      .deleteStoreImage(id);
+
+                                  if (context.mounted) {
+                                    if (success) {
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        const SnackBar(
+                                            content: Text('イベントを削除しました')),
+                                      );
+                                    } else {
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        const SnackBar(
+                                            content: Text('削除に失敗しました')),
+                                      );
+                                    }
+                                  }
+                                }
                               },
                               child: Card(
                                 margin: const EdgeInsets.all(12),
@@ -366,7 +389,7 @@ class _TableCalendarSampleState extends ConsumerState<TableCalendarSample> {
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
                                         children: [
-                                          // 1行目：店舗名と削除ボタン
+                                          // 1行目：店舗名
                                           Row(
                                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                             children: [
@@ -379,65 +402,6 @@ class _TableCalendarSampleState extends ConsumerState<TableCalendarSample> {
                                                   ),
                                                 ),
                                               ),
-                                              //ここに削除ボタンを記述
-                                              if (isLoggedIn == true)
-                                                Container(
-                                                  decoration: BoxDecoration(
-                                                    border: Border.all(color: Colors.grey),
-                                                    borderRadius: BorderRadius.circular(6),
-                                                  ),
-                                                  child: IconButton(
-                                                    icon: const Icon(Icons.close, size: 16, color: Colors.black),
-                                                    padding: const EdgeInsets.all(4),
-                                                    constraints: const BoxConstraints(),
-                                                    onPressed: () {
-                                                      showDialog(
-                                                        context: context,
-                                                        builder: (BuildContext context) {
-                                                          return AlertDialog(
-                                                            title: const Text(
-                                                              "投稿の削除",
-                                                              style: TextStyle(fontWeight: FontWeight.bold),
-                                                            ),
-                                                            content: const Text("この投稿を削除しますか？"),
-                                                            actionsAlignment: MainAxisAlignment.spaceBetween,
-                                                            actions: [
-                                                              TextButton(
-                                                                child: const Text("キャンセル"),
-                                                                onPressed: () {
-                                                                  Navigator.of(context).pop();
-                                                                },
-                                                              ),
-                                                              TextButton(
-                                                                child: const Text(
-                                                                  "削除",
-                                                                ),
-                                                                onPressed: () async {
-                                                                  // データベースから削除する
-                                                                  final success = await ref
-                                                                      .read(storeImageViewModelProvider.notifier)
-                                                                      .deleteStoreImage(item.id);
-                                                                  
-                                                                  Navigator.of(context).pop();
-                                                                  
-                                                                  if (success) {
-                                                                    ScaffoldMessenger.of(context).showSnackBar(
-                                                                      const SnackBar(content: Text('イベントを削除しました')),
-                                                                    );
-                                                                  } else {
-                                                                    ScaffoldMessenger.of(context).showSnackBar(
-                                                                      const SnackBar(content: Text('削除に失敗しました')),
-                                                                    );
-                                                                  }
-                                                                },
-                                                              ),
-                                                            ],
-                                                          );
-                                                        },
-                                                      );
-                                                    },
-                                                  ),
-                                                ),
                                             ],
                                           ),
                                           const SizedBox(height: 8),
