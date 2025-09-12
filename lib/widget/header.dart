@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hackathon/view_model/login.dart';
 import 'package:hackathon/view_model/user_status.dart';
 import '../view/login_page.dart';
 
@@ -11,11 +12,11 @@ class Header extends ConsumerWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final user_status = ref.watch(userStatusViewModelProvider.notifier);
-    final isLoggedIn = ref.watch(userStatusViewModelProvider).isLoggedIn;
+    final userStatus = ref.watch(userStatusViewModelProvider);
+    final isLoggedIn = userStatus.isLoggedIn;
 
     return AppBar(
-      title: Center(
+      title: const Center(
         child: Text(
           '石橋商店街カレンダー',
           style: TextStyle(fontWeight: FontWeight.bold),
@@ -38,18 +39,21 @@ class Header extends ConsumerWidget implements PreferredSizeWidget {
                 context: context,
                 builder: (context) {
                   return AlertDialog(
-                    title: const Text('ログイン中'),
-                    content: const Text('すでにログインしています'),
+                    title: const Text('ログアウトしますか？'),
+                    content: const Text('現在ログインしています。'),
                     actions: [
                       TextButton(
                         onPressed: () {
                           Navigator.pop(context);
                         },
-                        child: const Text('閉じる'),
+                        child: const Text('キャンセル'),
                       ),
                       TextButton(
                         onPressed: () {
-                          user_status.updateLoginStatus(false);
+                          // ViewModelのsignOutメソッドを呼び出す
+                          ref.read(loginViewModelProvider.notifier).signOut();
+                          // ログイン状態を更新
+                          ref.read(userStatusViewModelProvider.notifier).updateLoginStatus(false);
                           Navigator.pop(context);
                         },
                         child: const Text('ログアウト'),
@@ -70,3 +74,4 @@ class Header extends ConsumerWidget implements PreferredSizeWidget {
     );
   }
 }
+

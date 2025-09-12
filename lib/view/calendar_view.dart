@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hackathon/view_model/login.dart';
 import 'package:hackathon/view_model/user_status.dart';
 import 'package:table_calendar/table_calendar.dart';
 import '../widget/store_image_form_modal.dart';
 import 'package:hackathon/view_model/store_image.dart';
 import 'event-detail-view.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class MainPage extends StatelessWidget {
   const MainPage({super.key});
@@ -33,6 +35,23 @@ class _TableCalendarSampleState extends ConsumerState<TableCalendarSample> {
   @override
   Widget build(BuildContext context) {
     final images = ref.watch(storeImageViewModelProvider).images;
+    final isLoggedIn = ref.watch(userStatusViewModelProvider).isLoggedIn;
+
+    // ログアウト状態を監視してスナックバーを表示
+    ref.listen<AsyncValue<User?>>(loginViewModelProvider, (previous, current) {
+      // previousがロード中またはエラー状態の場合は何もしない
+      if (previous == null || previous.isLoading || previous.hasError) return;
+
+      // ログイン状態からログアウト状態への変化を検知
+      final wasLoggedIn = previous.hasValue && previous.value != null;
+      final isLoggedOut = current.hasValue && current.value == null;
+
+      if (wasLoggedIn && isLoggedOut) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('ログアウトしました')),
+        );
+      }
+    });
 
     // イベントがある日を時刻なしDateでまとめる
     final eventDates = images
@@ -44,7 +63,7 @@ class _TableCalendarSampleState extends ConsumerState<TableCalendarSample> {
           ),
         )
         .toSet();
-    final isLoggedIn = ref.watch(userStatusViewModelProvider).isLoggedIn;
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (isLoggedIn == true && Navigator.canPop(context)) {
         Navigator.pop(context);
@@ -284,3 +303,4 @@ class _TableCalendarSampleState extends ConsumerState<TableCalendarSample> {
     );
   }
 }
+
