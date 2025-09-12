@@ -231,13 +231,65 @@ class _TableCalendarSampleState extends ConsumerState<TableCalendarSample> {
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
                                         children: [
-                                          // 1行目：店舗名
-                                          Text(
-                                            '店舗名: ${item.storeName}',
-                                            style: const TextStyle(
-                                              fontSize: 16,
-                                              fontWeight: FontWeight.bold,
-                                            ),
+                                          // 1行目：店舗名と削除ボタン
+                                          Row(
+                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Expanded(
+                                                child: Text(
+                                                  '店舗名: ${item.storeName}',
+                                                  style: const TextStyle(
+                                                    fontSize: 16,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                              ),
+                                              //ここに削除ボタンを記述
+                                              if (isLoggedIn == true)
+                                                Container(
+                                                  decoration: BoxDecoration(
+                                                    border: Border.all(color: Colors.grey),
+                                                    borderRadius: BorderRadius.circular(6),
+                                                  ),
+                                                  child: IconButton(
+                                                    icon: const Icon(Icons.close, size: 16, color: Colors.black),
+                                                    padding: const EdgeInsets.all(4),
+                                                    constraints: const BoxConstraints(),
+                                                    onPressed: () {
+                                                      showDialog(
+                                                        context: context,
+                                                        builder: (BuildContext context) {
+                                                          return AlertDialog(
+                                                            title: const Text(
+                                                              "投稿の削除",
+                                                              style: TextStyle(fontWeight: FontWeight.bold),
+                                                            ),
+                                                            content: const Text("この投稿を削除しますか？"),
+                                                            actionsAlignment: MainAxisAlignment.spaceBetween,
+                                                            actions: [
+                                                              TextButton(
+                                                                child: const Text("キャンセル"),
+                                                                onPressed: () {
+                                                                  Navigator.of(context).pop();
+                                                                },
+                                                              ),
+                                                              TextButton(
+                                                                child: const Text(
+                                                                  "削除",
+                                                                ),
+                                                                onPressed: () {
+                                                                  // ref.read(storeImageViewModelProvider.notifier).deleteImage(item);
+                                                                  Navigator.of(context).pop();
+                                                                },
+                                                              ),
+                                                            ],
+                                                          );
+                                                        },
+                                                      );
+                                                    },
+                                                  ),
+                                                ),
+                                            ],
                                           ),
                                           const SizedBox(height: 8),
                                           // 2行目：タイトルと日付
