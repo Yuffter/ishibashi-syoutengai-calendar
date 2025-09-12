@@ -29,6 +29,69 @@ class TableCalendarSample extends ConsumerStatefulWidget {
 }
 
 class _TableCalendarSampleState extends ConsumerState<TableCalendarSample> {
+  final holidays = <DateTime>{
+    // 2024年
+    DateTime(2024, 1, 1),
+    DateTime(2024, 1, 8),
+    DateTime(2024, 2, 11),
+    DateTime(2024, 2, 12),
+    DateTime(2024, 2, 23),
+    DateTime(2024, 3, 20),
+    DateTime(2024, 4, 29),
+    DateTime(2024, 5, 3),
+    DateTime(2024, 5, 4),
+    DateTime(2024, 5, 5),
+    DateTime(2024, 5, 6),
+    DateTime(2024, 7, 15),
+    DateTime(2024, 8, 11),
+    DateTime(2024, 8, 12),
+    DateTime(2024, 9, 16),
+    DateTime(2024, 9, 22),
+    DateTime(2024, 9, 23),
+    DateTime(2024, 10, 14),
+    DateTime(2024, 11, 3),
+    DateTime(2024, 11, 4),
+    DateTime(2024, 11, 23),
+    // 2025年
+    DateTime(2025, 1, 1),
+    DateTime(2025, 1, 13),
+    DateTime(2025, 2, 11),
+    DateTime(2025, 2, 23),
+    DateTime(2025, 2, 24),
+    DateTime(2025, 3, 20),
+    DateTime(2025, 4, 29),
+    DateTime(2025, 5, 3),
+    DateTime(2025, 5, 4),
+    DateTime(2025, 5, 5),
+    DateTime(2025, 5, 6),
+    DateTime(2025, 7, 21),
+    DateTime(2025, 8, 11),
+    DateTime(2025, 9, 15),
+    DateTime(2025, 9, 23),
+    DateTime(2025, 10, 13),
+    DateTime(2025, 11, 3),
+    DateTime(2025, 11, 23),
+    DateTime(2025, 11, 24),
+    // 2026年
+    DateTime(2026, 1, 1),
+    DateTime(2026, 1, 12),
+    DateTime(2026, 2, 11),
+    DateTime(2026, 2, 23),
+    DateTime(2026, 3, 20),
+    DateTime(2026, 4, 29),
+    DateTime(2026, 5, 3),
+    DateTime(2026, 5, 4),
+    DateTime(2026, 5, 5),
+    DateTime(2026, 5, 6),
+    DateTime(2026, 7, 20),
+    DateTime(2026, 8, 11),
+    DateTime(2026, 9, 21),
+    DateTime(2026, 9, 23),
+    DateTime(2026, 10, 12),
+    DateTime(2026, 11, 3),
+    DateTime(2026, 11, 23),
+  };
+
   DateTime _focusedDay = DateTime.now();
   DateTime _selectedDay = DateTime.now();
 
@@ -89,23 +152,92 @@ class _TableCalendarSampleState extends ConsumerState<TableCalendarSample> {
               });
             },
             calendarBuilders: CalendarBuilders(
-              markerBuilder: (context, date, events) {
-                final normalizedDate = DateTime(
-                  date.year,
-                  date.month,
-                  date.day,
+              // 通常の日のビルダー
+              defaultBuilder: (context, day, focusedDay) {
+                TextStyle? textStyle;
+                final dayOnly = DateTime(day.year, day.month, day.day);
+                if (holidays.contains(dayOnly) || day.weekday == DateTime.sunday) {
+                  textStyle = const TextStyle(color: Colors.red);
+                } else if (day.weekday == DateTime.saturday) {
+                  textStyle = const TextStyle(color: Colors.blue);
+                }
+                return Center(
+                  child: Text('${day.day}', style: textStyle),
                 );
+              },
+              // 今日のビルダー
+              todayBuilder: (context, day, focusedDay) {
+                TextStyle textStyle = const TextStyle();
+                final dayOnly = DateTime(day.year, day.month, day.day);
+                if (holidays.contains(dayOnly) || day.weekday == DateTime.sunday) {
+                  textStyle = const TextStyle(color: Colors.red);
+                } else if (day.weekday == DateTime.saturday) {
+                  textStyle = const TextStyle(color: Colors.blue);
+                }
+                // デフォルトの todayDecoration を模倣
+                return Center(
+                  child: Container(
+                    width: 32,
+                    height: 32,
+                    decoration: BoxDecoration(
+                      // 控えめなグレーで今日の印とする
+                      color: Colors.grey.shade200,
+                      shape: BoxShape.circle,
+                    ),
+                    alignment: Alignment.center,
+                    child: Text('${day.day}', style: textStyle),
+                  ),
+                );
+              },
+              // 選択された日のビルダー
+              selectedBuilder: (context, day, focusedDay) {
+                // デフォルトの selectedDecoration を模倣
+                return Center(
+                  child: Container(
+                    width: 32,
+                    height: 32,
+                    decoration: BoxDecoration(
+                      // テーマのプライマリカラーを使用
+                      color: Theme.of(context).primaryColor,
+                      shape: BoxShape.circle,
+                    ),
+                    alignment: Alignment.center,
+                    child: Text(
+                      '${day.day}',
+                      // 選択日は視認性のために白文字にする
+                      style: const TextStyle(color: Colors.white),
+                    ),
+                  ),
+                );
+              },
+              // 月外の日のビルダー
+              outsideBuilder: (context, day, focusedDay) {
+                Color textColor = Colors.grey.withOpacity(0.5);
+                final dayOnly = DateTime(day.year, day.month, day.day);
+                if (holidays.contains(dayOnly) || day.weekday == DateTime.sunday) {
+                  textColor = Colors.red.withOpacity(0.5);
+                } else if (day.weekday == DateTime.saturday) {
+                  textColor = Colors.blue.withOpacity(0.5);
+                }
+                return Center(
+                  child: Text(
+                    '${day.day}',
+                    style: TextStyle(color: textColor),
+                  ),
+                );
+              },
+              // 既存のマーカービルダーは維持
+              markerBuilder: (context, date, events) {
+                final normalizedDate = DateTime(date.year, date.month, date.day);
                 final hasEvent = eventDates.contains(normalizedDate);
-
                 if (!hasEvent) return const SizedBox.shrink();
-
                 return Positioned(
                   bottom: 0,
                   child: Container(
                     width: 7,
                     height: 7,
                     decoration: const BoxDecoration(
-                      color: Colors.grey, // ドットの色
+                      color: Colors.grey,
                       shape: BoxShape.circle,
                     ),
                   ),
@@ -396,5 +528,3 @@ class _TableCalendarSampleState extends ConsumerState<TableCalendarSample> {
     );
   }
 }
-
-
