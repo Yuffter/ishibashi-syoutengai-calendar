@@ -27,8 +27,22 @@ void main() async {
   runApp(ProviderScope(child: const MyApp()));
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  @override
+  void initState() {
+    super.initState();
+    // 3秒後にスプラッシュスクリーンを削除
+    Future.delayed(const Duration(seconds: 2), () {
+      FlutterNativeSplash.remove();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +51,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
         useMaterial3: true,
-        fontFamily: 'Noto Sans JP'
+        fontFamily: 'Noto Sans JP',
       ),
       localizationsDelegates: const [
         GlobalMaterialLocalizations.delegate,
@@ -49,10 +63,7 @@ class MyApp extends StatelessWidget {
         Locale('en', 'US'), // 英語
       ],
       locale: const Locale('ja', 'JP'),
-      home: const Scaffold(
-        appBar: Header(),
-        body: MainPage(),
-      ),
+      home: const Scaffold(appBar: Header(), body: MainPage()),
     );
   }
 }

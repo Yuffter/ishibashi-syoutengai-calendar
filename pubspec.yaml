@@ -65,8 +65,9 @@ dev_dependencies:
   build_runner: ^2.5.4
 
 flutter_native_splash:
-  color: "#795548"
-  image: images/logo.jpg
+  web: true
+  color: "#ffffff"
+  image: assets/images/logo.jpg
   fullscreen: true
 
 # For information on the generic Dart part of this file, see the
