@@ -8,9 +8,11 @@ import 'view/login_page.dart';
 import 'firebase_options.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'widget/header.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
+  WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+  FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
 
   // Firebase初期化
   try {
@@ -25,8 +27,22 @@ void main() async {
   runApp(ProviderScope(child: const MyApp()));
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  @override
+  void initState() {
+    super.initState();
+    // 3秒後にスプラッシュスクリーンを削除
+    Future.delayed(const Duration(seconds: 2), () {
+      FlutterNativeSplash.remove();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +51,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
         useMaterial3: true,
-        fontFamily: 'Noto Sans JP'
+        fontFamily: 'Noto Sans JP',
       ),
       localizationsDelegates: const [
         GlobalMaterialLocalizations.delegate,
@@ -47,10 +63,7 @@ class MyApp extends StatelessWidget {
         Locale('en', 'US'), // 英語
       ],
       locale: const Locale('ja', 'JP'),
-      home: const Scaffold(
-        appBar: Header(),
-        body: MainPage(),
-      ),
+      home: const Scaffold(appBar: Header(), body: MainPage()),
     );
   }
 }
