@@ -280,9 +280,23 @@ class _TableCalendarSampleState extends ConsumerState<TableCalendarSample> {
                                                                 child: const Text(
                                                                   "削除",
                                                                 ),
-                                                                onPressed: () {
-                                                                  // ref.read(storeImageViewModelProvider.notifier).deleteImage(item);
+                                                                onPressed: () async {
+                                                                  // データベースから削除する
+                                                                  final success = await ref
+                                                                      .read(storeImageViewModelProvider.notifier)
+                                                                      .deleteStoreImage(item.id);
+                                                                  
                                                                   Navigator.of(context).pop();
+                                                                  
+                                                                  if (success) {
+                                                                    ScaffoldMessenger.of(context).showSnackBar(
+                                                                      const SnackBar(content: Text('イベントを削除しました')),
+                                                                    );
+                                                                  } else {
+                                                                    ScaffoldMessenger.of(context).showSnackBar(
+                                                                      const SnackBar(content: Text('削除に失敗しました')),
+                                                                    );
+                                                                  }
                                                                 },
                                                               ),
                                                             ],
