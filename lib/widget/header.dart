@@ -16,10 +16,13 @@ class Header extends ConsumerWidget implements PreferredSizeWidget {
     final isLoggedIn = userStatus.isLoggedIn;
 
     return AppBar(
+      backgroundColor: Colors.grey[100],
+      elevation: 0,
+      scrolledUnderElevation: 0,
       title: const Center(
         child: Text(
           '石橋商店街カレンダー',
-          style: TextStyle(fontWeight: FontWeight.bold),
+          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black87),
         ),
       ),
       actions: [
