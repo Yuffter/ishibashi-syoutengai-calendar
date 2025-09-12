@@ -39,8 +39,12 @@ class Header extends ConsumerWidget implements PreferredSizeWidget {
                 context: context,
                 builder: (context) {
                   return AlertDialog(
-                    title: const Text('ログアウトしますか？'),
+                    title: const Text(
+                      'ログアウトしますか？',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
                     content: const Text('現在ログインしています。'),
+                    actionsAlignment: MainAxisAlignment.spaceBetween,
                     actions: [
                       TextButton(
                         onPressed: () {
@@ -56,7 +60,9 @@ class Header extends ConsumerWidget implements PreferredSizeWidget {
                           ref.read(userStatusViewModelProvider.notifier).updateLoginStatus(false);
                           Navigator.pop(context);
                         },
-                        child: const Text('ログアウト'),
+                        child: const Text(
+                          'ログアウト',
+                        ),
                       ),
                     ],
                   );
