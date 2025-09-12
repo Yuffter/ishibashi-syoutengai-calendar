@@ -80,10 +80,14 @@ class LoginPage extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: <Widget>[
                   const SizedBox(height: 60),
-                  const Text(
-                    '石橋商店街カレンダー',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 36, fontWeight: FontWeight.bold),
+                  const FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Text(
+                      '石橋商店街カレンダー',
+                      softWrap: false,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(fontSize: 36, fontWeight: FontWeight.bold),
+                    ),
                   ),
                   const SizedBox(height: 60),
                   const Text(
