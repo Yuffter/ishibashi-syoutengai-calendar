@@ -168,7 +168,7 @@ class _TableCalendarSampleState extends ConsumerState<TableCalendarSample> {
                                         top: Radius.circular(12),
                                       ),
                                       child: SizedBox(
-                                        height: 200,
+                                        height: 150,
                                         child: Image.network(
                                           item.imageUrl,
                                           width: double.infinity,
@@ -178,7 +178,7 @@ class _TableCalendarSampleState extends ConsumerState<TableCalendarSample> {
                                             if (loadingProgress == null) return child;
                                             return Container(
                                               width: double.infinity,
-                                              height: 180,
+                                              height: 130,
                                               decoration: BoxDecoration(
                                                 color: Colors.grey[200],
                                               ),
@@ -200,7 +200,7 @@ class _TableCalendarSampleState extends ConsumerState<TableCalendarSample> {
                                               (context, error, stackTrace) {
                                             return Container(
                                               width: double.infinity,
-                                              height: 180,
+                                              height: 130,
                                               decoration: BoxDecoration(
                                                 color: Colors.grey[300],
                                               ),
