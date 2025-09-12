@@ -230,7 +230,10 @@ class _TableCalendarSampleState extends ConsumerState<TableCalendarSample> {
                                                 final shouldDelete = await showDialog<bool>(
                                                   context: context,
                                                   builder: (ctx) => AlertDialog(
-                                                    title: const Text('削除の確認'),
+                                                    title: const Text(
+                                                      '削除の確認',
+                                                      style: TextStyle(fontWeight: FontWeight.bold),
+                                                    ),
                                                     content: const Text('このイベントを削除してもよろしいですか？'),
                                                     actions: [
                                                       Row(
