@@ -10,16 +10,25 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 // パスワードの表示・非表示を管理する
 final passwordVisibilityProvider = StateProvider<bool>((ref) => false);
+// ログインエラーメッセージを管理する
+final loginErrorProvider = StateProvider<String?>((ref) => null);
 
 // UI（画面）の作成
 class LoginPage extends ConsumerWidget {
   const LoginPage({super.key});
+
+  // メールアドレスの形式を検証する正規表現
+  bool _isValidEmail(String email) {
+    return RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+        .hasMatch(email);
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final userStatus = ref.watch(userStatusViewModelProvider.notifier);
     final userLoginInput = ref.watch(userLoginInputViewModelProvider.notifier);
     final isPasswordVisible = ref.watch(passwordVisibilityProvider);
+    final loginError = ref.watch(loginErrorProvider);
 
     // ViewModelの状態を監視
     ref.listen<AsyncValue<User?>>(loginViewModelProvider, (previous, current) {
@@ -31,31 +40,26 @@ class LoginPage extends ConsumerWidget {
         final error = current.error;
         String errorMessage = 'エラーが発生しました';
         if (error is FirebaseAuthException) {
-          // Firebaseの認証エラーコードに応じてメッセージを分岐 [2, 9]
+          // Firebaseの認証エラーコードに応じてメッセージを分岐
           switch (error.code) {
             case 'user-not-found':
-              errorMessage = '指定されたメールアドレスのユーザーは見つかりません。';
-              break;
             case 'wrong-password':
-              errorMessage = 'パスワードが間違っています。';
-              break;
             case 'invalid-email':
-              errorMessage = 'メールアドレスの形式が正しくありません。';
+              errorMessage = 'メールアドレスまたはパスワードが正しくありません。';
               break;
             default:
-              errorMessage = 'ログインに失敗しました。';
+              errorMessage = 'ログインに失敗しました。もう一度お試しください。';
           }
         }
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(errorMessage)));
+        // エラーメッセージをStateにセット
+        ref.read(loginErrorProvider.notifier).state = errorMessage;
         return;
       }
 
-      // 成功時の処理（previousがnullでcurrentがUserオブジェクトの場合）
-      if (current.hasValue &&
-          current.value != null &&
-          (previous == null || previous.value == null)) {
+      // 成功時の処理
+      if (current.hasValue && current.value != null) {
+        // エラーメッセージをクリア
+        ref.read(loginErrorProvider.notifier).state = null;
         ScaffoldMessenger.of(
           context,
         ).showSnackBar(const SnackBar(content: Text('ログインに成功しました')));
@@ -138,19 +142,34 @@ class LoginPage extends ConsumerWidget {
                           .updatePassword(value);
                     },
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 16),
+                  // エラーメッセージ表示領域
+                  if (loginError != null)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 8.0),
+                      child: Text(
+                        loginError,
+                        style: const TextStyle(color: Colors.red, fontSize: 14),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
                   // ログインボタン
                   SizedBox(
                     height: 48,
                     child: ElevatedButton(
                       onPressed: () {
+                        // 以前のエラーメッセージをクリア
+                        ref.read(loginErrorProvider.notifier).state = null;
+
+                        // メールアドレスの形式をクライアントサイドで検証
+                        if (!_isValidEmail(userLoginInput.mailAddress)) {
+                          ref.read(loginErrorProvider.notifier).state =
+                              'メールアドレスの形式が正しくありません。';
+                          return; // ログイン処理を中断
+                        }
+
                         // ログイン処理
-                        print(
-                          'ログイン試行 Email: ${userLoginInput.mailAddress}, Password: ${userLoginInput.password}',
-                        );
-                        ref
-                            .read(loginViewModelProvider.notifier)
-                            .login(
+                        ref.read(loginViewModelProvider.notifier).login(
                               userLoginInput.mailAddress,
                               userLoginInput.password,
                             );

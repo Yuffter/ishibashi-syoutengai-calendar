@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hackathon/view_model/login.dart';
 import 'package:hackathon/view_model/user_status.dart';
 import '../view/login_page.dart';
 
@@ -11,11 +12,11 @@ class Header extends ConsumerWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final user_status = ref.watch(userStatusViewModelProvider.notifier);
-    final isLoggedIn = ref.watch(userStatusViewModelProvider).isLoggedIn;
+    final userStatus = ref.watch(userStatusViewModelProvider);
+    final isLoggedIn = userStatus.isLoggedIn;
 
     return AppBar(
-      title: Center(
+      title: const Center(
         child: Text(
           '石橋商店街カレンダー',
           style: TextStyle(fontWeight: FontWeight.bold),
@@ -78,3 +79,4 @@ class Header extends ConsumerWidget implements PreferredSizeWidget {
     );
   }
 }
+

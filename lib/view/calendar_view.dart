@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hackathon/view_model/login.dart';
 import 'package:hackathon/view_model/user_status.dart';
 import 'package:table_calendar/table_calendar.dart';
 import '../widget/store_image_form_modal.dart';
 import 'package:hackathon/view_model/store_image.dart';
 import 'event-detail-view.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class MainPage extends StatelessWidget {
   const MainPage({super.key});
@@ -34,6 +36,23 @@ class _TableCalendarSampleState extends ConsumerState<TableCalendarSample> {
   @override
   Widget build(BuildContext context) {
     final images = ref.watch(storeImageViewModelProvider).images;
+    final isLoggedIn = ref.watch(userStatusViewModelProvider).isLoggedIn;
+
+    // ログアウト状態を監視してスナックバーを表示
+    ref.listen<AsyncValue<User?>>(loginViewModelProvider, (previous, current) {
+      // previousがロード中またはエラー状態の場合は何もしない
+      if (previous == null || previous.isLoading || previous.hasError) return;
+
+      // ログイン状態からログアウト状態への変化を検知
+      final wasLoggedIn = previous.hasValue && previous.value != null;
+      final isLoggedOut = current.hasValue && current.value == null;
+
+      if (wasLoggedIn && isLoggedOut) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('ログアウトしました')),
+        );
+      }
+    });
 
     // イベントがある日を時刻なしDateでまとめる
     final eventDates = images
@@ -45,7 +64,7 @@ class _TableCalendarSampleState extends ConsumerState<TableCalendarSample> {
           ),
         )
         .toSet();
-    final isLoggedIn = ref.watch(userStatusViewModelProvider).isLoggedIn;
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (isLoggedIn == true && Navigator.canPop(context)) {
         Navigator.pop(context);
@@ -94,88 +113,89 @@ class _TableCalendarSampleState extends ConsumerState<TableCalendarSample> {
           ),
           const SizedBox(height: 8),
           Expanded(
-            child: Consumer(
-              builder: (context, ref, _) {
-                final images = ref.watch(storeImageViewModelProvider);
-                final filtered = images.images
-                    .where((img) => isSameDay(img.eventDate, _selectedDay))
-                    .toList();
+            child: Stack(
+              children: [
+                Consumer(
+                  builder: (context, ref, _) {
+                    final images = ref.watch(storeImageViewModelProvider);
+                    final filtered = images.images
+                        .where((img) => isSameDay(img.eventDate, _selectedDay))
+                        .toList();
 
-                if (filtered.isEmpty) {
-                  return const Center(child: Text('この日のイベントはありません'));
-                }
+                    if (filtered.isEmpty) {
+                      return const Center(child: Text('この日のイベントはありません'));
+                    }
 
-                return ListView.builder(
-                  itemCount: filtered.length,
-                  itemBuilder: (context, index) {
-                    final item = filtered[index];
-                    return Center(
-                      child: Container(
-                        constraints: const BoxConstraints(maxWidth: 600),
-                        child: GestureDetector(
-                          onTap: () {
-                            showModalBottomSheet(
-                              context: context,
-                              isScrollControlled: true,
-                              backgroundColor: Colors.transparent,
-                              builder: (context) {
-                                return FractionallySizedBox(
-                                  heightFactor: 0.90,
-                                  widthFactor: 1.0,
-                                  child: Container(
-                                    decoration: const BoxDecoration(
-                                      color: Colors.white,
-                                      borderRadius: BorderRadius.vertical(
-                                        top: Radius.circular(20),
+                    return ListView.builder(
+                      itemCount: filtered.length,
+                      itemBuilder: (context, index) {
+                        final item = filtered[index];
+                        return Center(
+                          child: Container(
+                            constraints: const BoxConstraints(maxWidth: 600),
+                            child: GestureDetector(
+                              onTap: () {
+                                showModalBottomSheet(
+                                  context: context,
+                                  isScrollControlled: true,
+                                  backgroundColor: Colors.transparent,
+                                  builder: (context) {
+                                    return FractionallySizedBox(
+                                      heightFactor: 0.90,
+                                      widthFactor: 1.0,
+                                      child: Container(
+                                        decoration: const BoxDecoration(
+                                          color: Colors.white,
+                                          borderRadius: BorderRadius.vertical(
+                                            top: Radius.circular(20),
+                                          ),
+                                        ),
+                                        child: EventDetailView(event: item),
                                       ),
-                                    ),
-                                    child: EventDetailView(event: item),
-                                  ),
+                                    );
+                                  },
                                 );
                               },
-                            );
-                          },
-                          child: Card(
-                            margin: const EdgeInsets.all(12),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                ClipRRect(
-                                  borderRadius: const BorderRadius.vertical(
-                                    top: Radius.circular(12),
-                                  ),
-                                  child: SizedBox(
-                                    height: 200,
-                                    child: Image.network(
-                                      item.imageUrl,
-                                      width: double.infinity,
-                                      fit: BoxFit.contain,
-                                      loadingBuilder: (context, child, loadingProgress) {
-                                        if (loadingProgress == null)
-                                          return child;
-                                        return Container(
+                              child: Card(
+                                margin: const EdgeInsets.all(12),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    ClipRRect(
+                                      borderRadius: const BorderRadius.vertical(
+                                        top: Radius.circular(12),
+                                      ),
+                                      child: SizedBox(
+                                        height: 200,
+                                        child: Image.network(
+                                          item.imageUrl,
                                           width: double.infinity,
-                                          height: 180,
-                                          decoration: BoxDecoration(
-                                            color: Colors.grey[200],
-                                          ),
-                                          child: Center(
-                                            child: CircularProgressIndicator(
-                                              value:
-                                                  loadingProgress
-                                                          .expectedTotalBytes !=
-                                                      null
-                                                  ? loadingProgress
-                                                            .cumulativeBytesLoaded /
-                                                        loadingProgress
-                                                            .expectedTotalBytes!
-                                                  : null,
-                                            ),
-                                          ),
-                                        );
-                                      },
-                                      errorBuilder:
-                                          (context, error, stackTrace) {
+                                          fit: BoxFit.contain,
+                                          loadingBuilder:
+                                              (context, child, loadingProgress) {
+                                            if (loadingProgress == null) return child;
+                                            return Container(
+                                              width: double.infinity,
+                                              height: 180,
+                                              decoration: BoxDecoration(
+                                                color: Colors.grey[200],
+                                              ),
+                                              child: Center(
+                                                child: CircularProgressIndicator(
+                                                  value: loadingProgress
+                                                              .expectedTotalBytes !=
+                                                          null
+                                                      ? loadingProgress
+                                                              .cumulativeBytesLoaded /
+                                                          loadingProgress
+                                                              .expectedTotalBytes!
+                                                      : null,
+                                                ),
+                                              ),
+                                            );
+                                          },
+                                          errorBuilder:
+                                              (context, error, stackTrace) {
                                             return Container(
                                               width: double.infinity,
                                               height: 180,
@@ -282,48 +302,86 @@ class _TableCalendarSampleState extends ConsumerState<TableCalendarSample> {
                                             ),
                                         ],
                                       ),
-                                      const SizedBox(height: 8),
-                                      // 2行目：タイトルと日付
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.all(12.0),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
                                         children: [
-                                          Expanded(
-                                            child: Text(
-                                              item.title,
-                                              style: const TextStyle(
-                                                fontSize: 20,
-                                                color: Color.fromARGB(
-                                                  255,
-                                                  112,
-                                                  112,
-                                                  112,
-                                                ),
-                                                fontWeight: FontWeight.bold,
-                                              ),
+                                          // 1行目：店舗名
+                                          Text(
+                                            '店舗名: ${item.storeName}',
+                                            style: const TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.bold,
                                             ),
                                           ),
-                                          Text(
-                                            '${item.eventDate.month}月${item.eventDate.day}日',
-                                            style: const TextStyle(
-                                              fontSize: 18,
-                                              color: Colors.grey,
-                                            ),
+                                          const SizedBox(height: 8),
+                                          // 2行目：タイトルと日付
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Expanded(
+                                                child: Text(
+                                                  item.title,
+                                                  style: const TextStyle(
+                                                    fontSize: 20,
+                                                    color: Color.fromARGB(
+                                                      255,
+                                                      112,
+                                                      112,
+                                                      112,
+                                                    ),
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                              ),
+                                              Text(
+                                                '${item.eventDate.month}月${item.eventDate.day}日',
+                                                style: const TextStyle(
+                                                  fontSize: 18,
+                                                  color: Colors.grey,
+                                                ),
+                                              ),
+                                            ],
                                           ),
                                         ],
                                       ),
-                                    ],
-                                  ),
+                                    ),
+                                  ],
                                 ),
-                              ],
+                              ),
                             ),
                           ),
-                        ),
-                      ),
+                        );
+                      },
                     );
                   },
-                );
-              },
+                ),
+                // 上部のぼかし効果
+                Positioned(
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  child: IgnorePointer(
+                    child: Container(
+                      height: 16.0, // グラデーションの高さ
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [
+                            Theme.of(context).scaffoldBackgroundColor,
+                            Theme.of(context).scaffoldBackgroundColor.withOpacity(0),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
         ],
@@ -347,3 +405,5 @@ class _TableCalendarSampleState extends ConsumerState<TableCalendarSample> {
     );
   }
 }
+
+
