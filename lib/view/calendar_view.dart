@@ -79,6 +79,9 @@ class _TableCalendarSampleState extends ConsumerState<TableCalendarSample> {
             locale: 'ja_JP',
             selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
             availableCalendarFormats: const {CalendarFormat.month: 'Month'},
+            calendarStyle: const CalendarStyle(
+              cellMargin: EdgeInsets.all(12),
+            ),
             onDaySelected: (selectedDay, focusedDay) {
               setState(() {
                 _selectedDay = selectedDay;
