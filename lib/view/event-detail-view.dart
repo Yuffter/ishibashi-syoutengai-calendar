@@ -1,19 +1,69 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hackathon/model/store_image.dart';
-import 'calendar_view.dart';
+import 'package:hackathon/view_model/user_status.dart';
 
-class EventDetailView extends StatelessWidget {
+class EventDetailView extends ConsumerWidget {
   final StoreImageModel event;
   const EventDetailView({super.key, required this.event});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    // ログイン状態を取得
+    final isLoggedIn = ref.watch(userStatusViewModelProvider).isLoggedIn;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text(
           'イベント詳細',
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
+        actions: [
+          // ログインしている場合のみ削除ボタンを表示
+          if (isLoggedIn == true)
+            IconButton(
+              icon: const Icon(Icons.delete_outline),
+              onPressed: () async {
+                final confirmed = await showDialog<bool>(
+                  context: context,
+                  builder: (BuildContext dialogContext) {
+                    return AlertDialog(
+                      title: const Text(
+                        "投稿の削除",
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      content: const Text("このイベントを削除しますか？"),
+                      actionsAlignment: MainAxisAlignment.spaceBetween,
+                      actions: [
+                        TextButton(
+                          child: const Text("キャンセル"),
+                          onPressed: () {
+                            Navigator.of(dialogContext).pop(false);
+                          },
+                        ),
+                        TextButton(
+                          child: const Text(
+                            "削除",
+                            style: TextStyle(color: Colors.red),
+                          ),
+                          onPressed: () {
+                            Navigator.of(dialogContext).pop(true);
+                          },
+                        ),
+                      ],
+                    );
+                  },
+                );
+
+                if (confirmed == true) {
+                  // 詳細画面は直接Providerを操作せず、削除要求を返す
+                  if (context.mounted) {
+                    Navigator.of(context).pop({'deleted': true, 'id': event.id});
+                  }
+                }
+              },
+            ),
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -49,7 +99,7 @@ class EventDetailView extends StatelessWidget {
                             child: CircularProgressIndicator(
                               value: loadingProgress.expectedTotalBytes != null
                                   ? loadingProgress.cumulativeBytesLoaded /
-                                        loadingProgress.expectedTotalBytes!
+                                      loadingProgress.expectedTotalBytes!
                                   : null,
                             ),
                           ),
