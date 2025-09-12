@@ -45,3 +45,16 @@ app.*.map.json
 /android/app/release
 flutter/
 lib/firebase_options.dart
+
+# Firebase Hosting キャッシュ
+.firebase/
+
+# Flutter Web build 成果物
+web/build/
+
+# Firebase deploy 一時ファイル
+.firebase-hosting-cache
+
+# macOS / Linux 系で紛れがちなやつ（念のため）
+*.tmp
+*.bak
