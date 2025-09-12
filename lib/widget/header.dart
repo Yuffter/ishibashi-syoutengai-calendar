@@ -38,21 +38,29 @@ class Header extends ConsumerWidget implements PreferredSizeWidget {
                 context: context,
                 builder: (context) {
                   return AlertDialog(
-                    title: const Text('ログイン中'),
+                    title: const Text(
+                      'ログイン中',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
                     content: const Text('すでにログインしています'),
                     actions: [
-                      TextButton(
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
-                        child: const Text('閉じる'),
-                      ),
-                      TextButton(
-                        onPressed: () {
-                          user_status.updateLoginStatus(false);
-                          Navigator.pop(context);
-                        },
-                        child: const Text('ログアウト'),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          TextButton(
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                            child: const Text('閉じる'),
+                          ),
+                          TextButton(
+                            onPressed: () {
+                              user_status.updateLoginStatus(false);
+                              Navigator.pop(context);
+                            },
+                            child: const Text('ログアウト'),
+                          ),
+                        ],
                       ),
                     ],
                   );
