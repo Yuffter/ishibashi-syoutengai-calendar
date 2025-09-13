@@ -177,11 +177,15 @@ class EventDetailView extends ConsumerWidget {
                 ),
               ),
               const SizedBox(height: 12),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                child: Text(
-                  '${event.description}',
-                  style: const TextStyle(fontSize: 15),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                  child: SingleChildScrollView(
+                    child: Text(
+                      '${event.description}',
+                      style: const TextStyle(fontSize: 15),
+                    ),
+                  ),
                 ),
               ),
               const SizedBox(height: 12),
