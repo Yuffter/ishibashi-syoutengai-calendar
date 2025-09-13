@@ -474,21 +474,17 @@ class _TableCalendarSampleState extends ConsumerState<TableCalendarSample> {
         ],
       ),
       floatingActionButton: isLoggedIn == true
-          ? Padding(
-              padding: const EdgeInsets.only(right: 5, bottom: 5),
-              child: SizedBox(
-                width: 72,
-                height: 72,
-                child: FloatingActionButton(
-                  onPressed: () {
-                    showStoreImageFormModal(context);
-                  },
-                  backgroundColor: Colors.white,
-                  child: const Icon(Icons.add, size: 36),
-                ),
-              ),
-            )
-          : null,
+        ? FloatingActionButton(
+            onPressed: () {
+              showStoreImageFormModal(
+                context,
+                initialDate: _selectedDay, // 選択日を渡す
+              );
+            },
+            backgroundColor: Colors.white,
+            child: const Icon(Icons.add, size: 36),
+          )
+        : null,
     );
   }
 }

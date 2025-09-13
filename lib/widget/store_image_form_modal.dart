@@ -10,11 +10,13 @@ import 'dart:typed_data';
 class StoreImageFormModal extends ConsumerStatefulWidget {
   final StoreImageModel? existingImage; // 編集の場合は既存のデータ
   final String? presetImageUrl; // 事前に設定された画像URL
+  final DateTime? initialDate;
 
   const StoreImageFormModal({
     super.key,
     this.existingImage,
     this.presetImageUrl,
+    this.initialDate,
   });
 
   @override
@@ -38,13 +40,18 @@ class _StoreImageFormModalState extends ConsumerState<StoreImageFormModal> {
   void initState() {
     super.initState();
 
-    // 既存データがある場合は初期値を設定
     if (widget.existingImage != null) {
       final existing = widget.existingImage!;
       _storeNameController.text = existing.storeName;
       _titleController.text = existing.title;
       _descriptionController.text = existing.description;
       _selectedDate = existing.eventDate;
+    } else if (widget.initialDate != null) {
+      // initialDate が渡されていればそれを使う（時刻は切り捨てておく）
+      final d = widget.initialDate!;
+      _selectedDate = DateTime(d.year, d.month, d.day);
+    } else {
+      _selectedDate = DateTime.now();
     }
   }
 
@@ -143,13 +150,20 @@ class _StoreImageFormModalState extends ConsumerState<StoreImageFormModal> {
           imageUrl = widget.existingImage!.imageUrl;
         }
 
+        // 日付を正規化（時間情報を削除）
+        final normalizedDate = DateTime(
+          _selectedDate.year,
+          _selectedDate.month,
+          _selectedDate.day,
+        );
+
         // Firestoreに保存
         final firestore = FirebaseFirestore.instance;
         final eventData = {
           'shop_name': _storeNameController.text.trim(),
           'title': _titleController.text.trim(),
           'description': _descriptionController.text.trim(),
-          'date': Timestamp.fromDate(_selectedDate),
+          'date': Timestamp.fromDate(normalizedDate), // 正規化した日付を使用
           'url': imageUrl,
         };
 
@@ -171,7 +185,7 @@ class _StoreImageFormModalState extends ConsumerState<StoreImageFormModal> {
               DateTime.now().millisecondsSinceEpoch.toString(),
           imageUrl: imageUrl,
           storeName: _storeNameController.text.trim(),
-          eventDate: _selectedDate,
+          eventDate: normalizedDate, // 正規化した日付を使用
           title: _titleController.text.trim(),
           description: _descriptionController.text.trim(),
         );
@@ -425,24 +439,25 @@ class _StoreImageFormModalState extends ConsumerState<StoreImageFormModal> {
   }
 }
 
-// モーダルを表示するヘルパー関数
-Future<void> showStoreImageFormModal(
-  BuildContext context, {
-  StoreImageModel? existingImage,
-  String? presetImageUrl,
-}) {
-  return showModalBottomSheet<void>(
-    context: context,
-    isScrollControlled: true,
-    backgroundColor: Colors.transparent,
-    builder: (BuildContext context) {
-      return Container(
-        height: 800,
-        child: StoreImageFormModal(
-          existingImage: existingImage,
-          presetImageUrl: presetImageUrl,
-        ),
-      );
-    },
-  );
-}
+  Future<void> showStoreImageFormModal(
+    BuildContext context, {
+    StoreImageModel? existingImage,
+    String? presetImageUrl,
+    DateTime? initialDate, // 追加
+  }) {
+    return showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (BuildContext context) {
+        return Container(
+          height: 800,
+          child: StoreImageFormModal(
+            existingImage: existingImage,
+            presetImageUrl: presetImageUrl,
+            initialDate: initialDate, // ここで渡す
+          ),
+        );
+      },
+    );
+  }
