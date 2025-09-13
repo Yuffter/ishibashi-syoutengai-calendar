@@ -14,54 +14,69 @@ class EventDetailView extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: const Color(0xFFfef8ff),
+        surfaceTintColor: const Color(0xFFfef8ff),
+        iconTheme: const IconThemeData(color: Colors.black),
         title: const Text(
           'イベント詳細',
-          style: TextStyle(fontWeight: FontWeight.bold),
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Colors.black,
+          ),
         ),
         actions: [
           // ログインしている場合のみ削除ボタンを表示
           if (isLoggedIn == true)
-            IconButton(
-              icon: const Icon(Icons.delete_outline),
-              onPressed: () async {
-                final confirmed = await showDialog<bool>(
-                  context: context,
-                  builder: (BuildContext dialogContext) {
-                    return AlertDialog(
-                      title: const Text(
-                        "投稿の削除",
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      content: const Text("このイベントを削除しますか？"),
-                      actionsAlignment: MainAxisAlignment.spaceBetween,
-                      actions: [
-                        TextButton(
-                          child: const Text("キャンセル"),
-                          onPressed: () {
-                            Navigator.of(dialogContext).pop(false);
-                          },
-                        ),
-                        TextButton(
-                          child: const Text(
-                            "削除",
-                            style: TextStyle(color: Colors.red),
+            Padding(
+              padding: const EdgeInsets.only(right: 10), // reduce the default right spacing
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.grey[200],
+                  shape: BoxShape.circle,
+                ),
+                child: IconButton(
+                  icon: const Icon(Icons.delete_outline),
+                  onPressed: () async {
+                    final confirmed = await showDialog<bool>(
+                      context: context,
+                      builder: (BuildContext dialogContext) {
+                        return AlertDialog(
+                          title: const Text(
+                            "投稿の削除",
+                            style: TextStyle(fontWeight: FontWeight.bold),
                           ),
-                          onPressed: () {
-                            Navigator.of(dialogContext).pop(true);
-                          },
-                        ),
-                      ],
+                          content: const Text("このイベントを削除しますか？"),
+                          actionsAlignment: MainAxisAlignment.spaceBetween,
+                          actions: [
+                            TextButton(
+                              child: const Text("キャンセル"),
+                              onPressed: () {
+                                Navigator.of(dialogContext).pop(false);
+                              },
+                            ),
+                            TextButton(
+                              child: const Text(
+                                "削除",
+                                style: TextStyle(color: Colors.red),
+                              ),
+                              onPressed: () {
+                                Navigator.of(dialogContext).pop(true);
+                              },
+                            ),
+                          ],
+                        );
+                      },
                     );
-                  },
-                );
 
-                if (confirmed == true) {
-                  // 詳細画面は直接Providerを操作せず、削除要求を返す
-                  if (context.mounted) {
-                    Navigator.of(context).pop({'deleted': true, 'id': event.id});
-                  }
-                }
-              },
+                    if (confirmed == true) {
+                      // 詳細画面は直接Providerを操作せず、削除要求を返す
+                      if (context.mounted) {
+                        Navigator.of(context).pop({'deleted': true, 'id': event.id});
+                      }
+                    }
+                  },
+                ),
+              ),
             ),
         ],
       ),
@@ -79,10 +94,10 @@ class EventDetailView extends ConsumerWidget {
                   ),
                   decoration: BoxDecoration(
                     border: Border.all(color: Colors.grey[600]!, width: 4.0),
-                    borderRadius: BorderRadius.circular(20),
+                    borderRadius: BorderRadius.circular(18),
                   ),
                   child: ClipRRect(
-                    borderRadius: BorderRadius.circular(16),
+                    borderRadius: BorderRadius.circular(14),
                     child: Image.network(
                       event.imageUrl,
                       height: 400,
@@ -93,7 +108,7 @@ class EventDetailView extends ConsumerWidget {
                           height: 400,
                           decoration: BoxDecoration(
                             color: Colors.grey[200],
-                            borderRadius: BorderRadius.circular(16),
+                            // borderRadius: BorderRadius.circular(5),
                           ),
                           child: Center(
                             child: CircularProgressIndicator(
@@ -177,11 +192,15 @@ class EventDetailView extends ConsumerWidget {
                 ),
               ),
               const SizedBox(height: 12),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                child: Text(
-                  '${event.description}',
-                  style: const TextStyle(fontSize: 15),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                  child: SingleChildScrollView(
+                    child: Text(
+                      '${event.description}',
+                      style: const TextStyle(fontSize: 15),
+                    ),
+                  ),
                 ),
               ),
               const SizedBox(height: 12),
