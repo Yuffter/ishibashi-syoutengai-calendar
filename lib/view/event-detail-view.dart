@@ -14,9 +14,15 @@ class EventDetailView extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: const Color(0xFFfef8ff),
+        surfaceTintColor: const Color(0xFFfef8ff),
+        iconTheme: const IconThemeData(color: Colors.black),
         title: const Text(
           'イベント詳細',
-          style: TextStyle(fontWeight: FontWeight.bold),
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Colors.black,
+          ),
         ),
         actions: [
           // ログインしている場合のみ削除ボタンを表示
@@ -88,10 +94,10 @@ class EventDetailView extends ConsumerWidget {
                   ),
                   decoration: BoxDecoration(
                     border: Border.all(color: Colors.grey[600]!, width: 4.0),
-                    borderRadius: BorderRadius.circular(20),
+                    borderRadius: BorderRadius.circular(18),
                   ),
                   child: ClipRRect(
-                    borderRadius: BorderRadius.circular(16),
+                    borderRadius: BorderRadius.circular(14),
                     child: Image.network(
                       event.imageUrl,
                       height: 400,
@@ -102,7 +108,7 @@ class EventDetailView extends ConsumerWidget {
                           height: 400,
                           decoration: BoxDecoration(
                             color: Colors.grey[200],
-                            borderRadius: BorderRadius.circular(16),
+                            // borderRadius: BorderRadius.circular(5),
                           ),
                           child: Center(
                             child: CircularProgressIndicator(
