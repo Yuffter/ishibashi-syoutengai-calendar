@@ -1,7 +1,7 @@
 # 石橋商店街イベントカレンダー
 
 このリポジトリは、石橋商店街の各店舗のイベント情報をカレンダー形式で確認できるFlutterウェブアプリケーションのソースコードです。\
-https://ishibashi-syoutengai-calendar.app.web
+https://ishibashi-syoutengai-calendar.web.app
 
 ## 概要
 
