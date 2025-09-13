@@ -21,47 +21,56 @@ class EventDetailView extends ConsumerWidget {
         actions: [
           // ログインしている場合のみ削除ボタンを表示
           if (isLoggedIn == true)
-            IconButton(
-              icon: const Icon(Icons.delete_outline),
-              onPressed: () async {
-                final confirmed = await showDialog<bool>(
-                  context: context,
-                  builder: (BuildContext dialogContext) {
-                    return AlertDialog(
-                      title: const Text(
-                        "投稿の削除",
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      content: const Text("このイベントを削除しますか？"),
-                      actionsAlignment: MainAxisAlignment.spaceBetween,
-                      actions: [
-                        TextButton(
-                          child: const Text("キャンセル"),
-                          onPressed: () {
-                            Navigator.of(dialogContext).pop(false);
-                          },
-                        ),
-                        TextButton(
-                          child: const Text(
-                            "削除",
-                            style: TextStyle(color: Colors.red),
+            Padding(
+              padding: const EdgeInsets.only(right: 10), // reduce the default right spacing
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.grey[200],
+                  shape: BoxShape.circle,
+                ),
+                child: IconButton(
+                  icon: const Icon(Icons.delete_outline),
+                  onPressed: () async {
+                    final confirmed = await showDialog<bool>(
+                      context: context,
+                      builder: (BuildContext dialogContext) {
+                        return AlertDialog(
+                          title: const Text(
+                            "投稿の削除",
+                            style: TextStyle(fontWeight: FontWeight.bold),
                           ),
-                          onPressed: () {
-                            Navigator.of(dialogContext).pop(true);
-                          },
-                        ),
-                      ],
+                          content: const Text("このイベントを削除しますか？"),
+                          actionsAlignment: MainAxisAlignment.spaceBetween,
+                          actions: [
+                            TextButton(
+                              child: const Text("キャンセル"),
+                              onPressed: () {
+                                Navigator.of(dialogContext).pop(false);
+                              },
+                            ),
+                            TextButton(
+                              child: const Text(
+                                "削除",
+                                style: TextStyle(color: Colors.red),
+                              ),
+                              onPressed: () {
+                                Navigator.of(dialogContext).pop(true);
+                              },
+                            ),
+                          ],
+                        );
+                      },
                     );
-                  },
-                );
 
-                if (confirmed == true) {
-                  // 詳細画面は直接Providerを操作せず、削除要求を返す
-                  if (context.mounted) {
-                    Navigator.of(context).pop({'deleted': true, 'id': event.id});
-                  }
-                }
-              },
+                    if (confirmed == true) {
+                      // 詳細画面は直接Providerを操作せず、削除要求を返す
+                      if (context.mounted) {
+                        Navigator.of(context).pop({'deleted': true, 'id': event.id});
+                      }
+                    }
+                  },
+                ),
+              ),
             ),
         ],
       ),
